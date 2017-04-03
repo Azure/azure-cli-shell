@@ -250,3 +250,32 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# IDE files #
+.project
+.pydevproject
+.vscode/
+
+# Cache files #
+*.pyc
+__pycache__/
+
+# in src folder #
+shell/
+
+# OS gen files #
+.DS_Store
+
+# Virtual Environments #
+env/
+env27/
+shell/
+
+# installation things #
+dist/
+az_cli_shell.egg-info/
+azure_cli_shell.egg-info/
+build/
+install_script.sh
+.cache/
+release.sh

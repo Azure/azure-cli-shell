@@ -1,0 +1,38 @@
+sudo: false
+
+language: python
+
+matrix:
+  include:
+    - python: 2.7
+      env: ALLOW_FAILURE=false
+      os: linux
+    - python: 2.7
+      env: ALLOW_FAILURE=false
+      os: windows
+    - python: 3.5
+      env: ALLOW_FAILURE=false
+      os: linux
+    - python: 3.5
+      env: ALLOW_FAILURE=false
+      os: windows
+    - python: 3.6
+      env: ALLOW_FAILURE=false
+      os: linux
+    - python: 3.6
+      env: ALLOW_FAILURE=false
+      os: windows
+  # allow_failures:
+  #   - python: 2.7
+  #     env: ALLOW_FAILURE=true
+  fast_finish: true
+
+install:
+  - pip install -qqq virtualenv
+  - pip install -e .
+
+script:
+  - . build_in_travis.sh
+
+notifications:
+  email: false
