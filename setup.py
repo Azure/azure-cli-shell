@@ -16,6 +16,8 @@ DEPENDENCIES = [
 
 with open('README.rst', 'r', encoding='utf-8') as f:
     README = f.read()
+with open('HISTORY.rst', 'r', encoding='utf-8') as f:
+    HISTORY = f.read()
 
 __version__ = '0.1.1a27'
 
@@ -23,7 +25,7 @@ setup(
     name='azure-cli-shell',
     version=__version__,
     description='Microsoft Azure Command-Line Interactive Shell',
-    long_description=README + '\n\n',
+    long_description=README + '\n\n' + HISTORY,
     license='MIT',
     author='Microsoft Corporation',
     author_email='azpycli@microsoft.com',
