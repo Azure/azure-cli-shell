@@ -205,7 +205,7 @@ class AzCompleter(Completer):
                                         yield comp
 
                             except TypeError:
-                                print("Other completion method used")
+                                pass # other completion method used
 
         except CLIError:  # if the user isn't logged in
             pass
