@@ -44,7 +44,7 @@ SHELL_CONFIG_DIR = azclishell.configuration.get_config_dir
 NOTIFICATIONS = ""
 PROFILE = Profile()
 SELECT_SYMBOL = azclishell.configuration.SELECT_SYMBOL
-PART_SCREEN_EXAMPLE = 1/3
+PART_SCREEN_EXAMPLE = .3
 
 
 def handle_cd(cmd):
@@ -68,10 +68,10 @@ def space_examples(list_examples, rows):
         list_examples[i][1])
 
     example = "".join(exam for exam in examples_with_index)
-
     num_newline = example.count('\n')
+
     if num_newline > rows * PART_SCREEN_EXAMPLE:
-        len_of_excerpt = math.floor(rows * PART_SCREEN_EXAMPLE)
+        len_of_excerpt = math.floor(float(rows) * PART_SCREEN_EXAMPLE)
         group = example.split('\n')
         end = int(get_section() * len_of_excerpt)
         begin = int((get_section() - 1) * len_of_excerpt)
