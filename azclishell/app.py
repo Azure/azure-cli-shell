@@ -396,6 +396,7 @@ class Shell(object):
                     SHELL_CONFIGURATION.get_history())
         if '--version' in text:
             try:
+                continue_flag = True
                 show_version_info_exit(sys.stdout)
             except SystemExit:
                 pass
