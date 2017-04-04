@@ -78,6 +78,15 @@ Pick the example you want with:
    $ vm create :: [Example Number]
 ```
 
+## Clear History
+
+```bash
+   $ clear
+```
+
+Only clears the appended suggestion when you restart the shell
+
+
 ## Dev Setup
 
 Fork and clone repository

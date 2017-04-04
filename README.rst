@@ -106,6 +106,16 @@ To get the Exit Code of the previous command:
    $ $
 
 
+Clear History
+#############
+
+Only clears the appended suggestion when you restart the shell
+
+.. code-block:: console
+
+   $ clear
+
+
 Docker Image
 ############
 

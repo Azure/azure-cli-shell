@@ -205,7 +205,7 @@ class AzCompleter(Completer):
                                         yield comp
 
                             except TypeError:
-                                print("Other completion method used")
+                                pass # other completion method used
 
         except CLIError:  # if the user isn't logged in
             pass
@@ -231,7 +231,8 @@ class AzCompleter(Completer):
             if word.startswith("-"):
                 self._is_command = False
             else:
-                temp_command = ' ' + str(word) if temp_command else str(word)
+
+                temp_command += ' ' + str(word) if temp_command else str(word)
 
             if self.branch.has_child(word):
                 self.branch = self.branch.get_child(word, self.branch.children)
