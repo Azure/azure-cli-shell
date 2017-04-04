@@ -29,11 +29,11 @@ def run_pylint():
 def run_pep8():
     arguments = 'azclishell'
 
-    # command = 'flake8 --statistics --append-config={} {}'.format(
-    #     os.path.join(automation_path.get_repo_root(), '.flake8'),
-    #     arguments)
+    command = 'flake8 --statistics --append-config={} {}'.format(
+        os.path.join(automation_path.get_repo_root(), '.flake8'),
+        arguments)
 
-    return_code = call(('python -m pep8 ' + arguments).split())
+    return_code = call((command).split())
     if return_code:
         print('Flake8 failed')
     else:

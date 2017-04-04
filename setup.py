@@ -12,7 +12,8 @@ DEPENDENCIES = [
     'prompt_toolkit',
     'pylint',
     'pyyaml',
-    'pep8',
+    'autopep8',
+    'flake8',
     'six',
 ]
 
