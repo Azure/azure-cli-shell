@@ -15,9 +15,7 @@ import azclishell.configuration as config
 
 CMD_TABLE = APPLICATION.configuration.get_command_table()
 
-
-def dump_command_table():
-    """ dumps the command table """
+def install_modules():
     command_file = config.CONFIGURATION.get_help_files()
 
     for cmd in CMD_TABLE:
@@ -35,6 +33,10 @@ def dump_command_table():
         except Exception:  # pylint: disable=broad-except
             print("Error loading: {}".format(mod))
     _update_command_definitions(CMD_TABLE)
+
+def dump_command_table():
+    """ dumps the command table """
+    install_modules()
 
     data = {}
     for cmd in CMD_TABLE:

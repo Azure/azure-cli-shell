@@ -17,5 +17,7 @@ init-import=yes
 max-locals=25
 # Maximum number of branch for function / method body
 max-branches=20
+# Maximum number of instance attributes / method body
+instance-attributes=20
 [SIMILARITIES]
 min-similarity-lines=10

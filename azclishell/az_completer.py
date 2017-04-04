@@ -53,6 +53,20 @@ def reformat_cmd(text):
     return text
 
 
+def gen_dyn_completion(comp, started_param, prefix, text):
+    """ how to validate and generate completion for dynamic params """
+    if len(comp.split()) > 1:
+        completion = '\"' + comp + '\"'
+    else:
+        completion = comp
+    if started_param:
+        if comp.lower().startswith(prefix.lower())\
+            and comp not in text.split():
+            yield Completion(completion, -len(prefix))
+    else:
+        yield Completion(completion, -len(prefix))
+
+# pylint: disable=too-many-instance-attributes
 class AzCompleter(Completer):
     """ Completes Azure CLI commands """
 
@@ -130,83 +144,69 @@ class AzCompleter(Completer):
 
             # dynamic param completion
             arg_name = ""
-            if self.curr_command in self.cmdtab:
-                if is_param: # finding the name of the arg
-                    for arg in self.cmdtab[self.curr_command].arguments:
+            if self.curr_command in self.cmdtab and is_param:
+                for arg in self.cmdtab[self.curr_command].arguments:
 
-                        for name in self.cmdtab[self.curr_command].arguments[arg].options_list:
-                            if name == param:
-                                arg_name = arg
-                                break
-
-                        if arg_name:
+                    for name in self.cmdtab[self.curr_command].arguments[arg].options_list:
+                        if name == param:
+                            arg_name = arg
                             break
 
-                    if arg_name and (text.split()[-1].startswith('-') or\
-                    text.split()[-2].startswith('-')):
-                        try:  # if enum completion
-                            for choice in self.cmdtab[
-                                    self.curr_command].arguments[arg_name].choices:
-                                if started_param:
-                                    if choice.lower().startswith(prefix.lower())\
-                                    and choice not in text.split():
-                                        yield Completion(choice, -len(prefix))
-                                else:
+                    if arg_name:
+                        break
+
+                if arg_name and (text.split()[-1].startswith('-') or\
+                text.split()[-2].startswith('-')):
+                    try:  # if enum completion
+                        for choice in self.cmdtab[
+                                self.curr_command].arguments[arg_name].choices:
+                            if started_param:
+                                if choice.lower().startswith(prefix.lower())\
+                                and choice not in text.split():
                                     yield Completion(choice, -len(prefix))
+                            else:
+                                yield Completion(choice, -len(prefix))
 
-                        except TypeError: # there is no choices option
-                            pass
+                    except TypeError: # there is no choices option
+                        pass
 
-                        parse_args = self.argsfinder.get_parsed_args(
-                            parse_quotes(text, quotes=False))
+                    parse_args = self.argsfinder.get_parsed_args(
+                        parse_quotes(text, quotes=False))
 
-                        # there are 3 formats for completers the cli uses
-                        # this try catches which format it is
-                        if self.cmdtab[self.curr_command].arguments[arg_name].completer:
+                    # there are 3 formats for completers the cli uses
+                    # this try catches which format it is
+                    if self.cmdtab[self.curr_command].arguments[arg_name].completer:
+                        try:
+                            for comp in self.cmdtab[self.curr_command].\
+                            arguments[arg_name].completer(prefix=prefix, action=None,\
+                            parser=None, parsed_args=parse_args):
+
+                                for comp in gen_dyn_completion(
+                                        comp, started_param, prefix, text):
+                                    yield comp
+
+                        except TypeError:
                             try:
                                 for comp in self.cmdtab[self.curr_command].\
-                                arguments[arg_name].completer(prefix=prefix, action=None,\
-                                parser=None, parsed_args=parse_args):
+                                arguments[arg_name].completer(prefix):
 
-                                    for comp in self.gen_dyn_completion(
+                                    for comp in gen_dyn_completion(
                                             comp, started_param, prefix, text):
                                         yield comp
-
                             except TypeError:
                                 try:
                                     for comp in self.cmdtab[self.curr_command].\
-                                    arguments[arg_name].completer(prefix):
+                                    arguments[arg_name].completer():
 
-                                        for comp in self.gen_dyn_completion(
+                                        for comp in gen_dyn_completion(
                                                 comp, started_param, prefix, text):
                                             yield comp
+
                                 except TypeError:
-                                    try:
-                                        for comp in self.cmdtab[self.curr_command].\
-                                        arguments[arg_name].completer():
-
-                                            for comp in self.gen_dyn_completion(
-                                                    comp, started_param, prefix, text):
-                                                yield comp
-
-                                    except TypeError:
-                                        print("TypeError: " + TypeError.message)
+                                    print("TypeError: " + TypeError.message)
 
         except CLIError:  # if the user isn't logged in
             pass
-
-    def gen_dyn_completion(self, comp, started_param, prefix, text):
-        """ how to validate and generate completion for dynamic params """
-        if len(comp.split()) > 1:
-            completion = '\"' + comp + '\"'
-        else:
-            completion = comp
-        if started_param:
-            if comp.lower().startswith(prefix.lower())\
-                and comp not in text.split():
-                yield Completion(completion, -len(prefix))
-        else:
-            yield Completion(completion, -len(prefix))
 
     def gen_cmd_completions(self, text):
         """ whether is a space or no text typed, send the current branch """

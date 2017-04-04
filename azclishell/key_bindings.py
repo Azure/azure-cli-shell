@@ -25,12 +25,13 @@ EXAMPLE_REPL = False
 SHOW_DEFAULT = False
 SYMBOLS = False
 
-
+# pylint: disable=too-few-public-methods
 class _PromptFilter(Filter):
     def __call__(self, *a, **kw):
         return not PROMPTING
 
 
+# pylint: disable=too-few-public-methods
 class _ExampleFilter(Filter):
     def __call__(self, *a, **kw):
         return not EXAMPLE_REPL
