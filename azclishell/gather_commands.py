@@ -8,6 +8,7 @@ from azclishell.command_tree import CommandBranch, CommandHead
 from azclishell.util import get_window_dim
 
 CONFIGURATION = azclishell.configuration.CONFIGURATION
+
 ROWS, COLS = get_window_dim()
 
 TOLERANCE = 10
@@ -23,6 +24,7 @@ def add_random_new_lines(long_phrase, line_min=LINE_MINIMUM, tolerance=TOLERANCE
     skip = False
     index = 0
     if len(long_phrase) > line_min:
+         # pylint: disable=unused-variable
         for num in range(int(math.floor(len(long_phrase) / line_min))):
             previous = index
             index += line_min
@@ -46,7 +48,7 @@ def add_random_new_lines(long_phrase, line_min=LINE_MINIMUM, tolerance=TOLERANCE
         counter += 1
     return long_phrase + "\n"
 
-
+# pylint: disable=too-many-instance-attributes
 class GatherCommands(object):
     """ grabs all the cached commands from files """
     def __init__(self):
@@ -88,7 +90,7 @@ class GatherCommands(object):
     def gather_from_files(self):
         """ gathers from the files in a way that is convienent to use """
         command_file = CONFIGURATION.get_help_files()
-        cache_path = os.path.join(CONFIGURATION.get_config_dir(), 'cache')
+        cache_path = os.path.join(azclishell.configuration.get_config_dir(), 'cache')
         with open(os.path.join(cache_path, \
         command_file), 'r') as help_file:
             data = json.load(help_file)

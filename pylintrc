@@ -5,7 +5,11 @@
 # I0011 Warning locally suppressed using disable-msg
 # W0511 fixme
 # R0401 Cyclic import (because of https://github.com/PyCQA/pylint/issues/850)
-disable=C0111,C0103,I0011,W0511,R0401
+# W0603 global var
+# W0613 unused-argument
+# F0401 import error
+# E0611 No name in module
+disable=C0111,C0103,I0011,W0511,R0401,W0603,W0613,F0401,E0611
 [VARIABLES]
 # Tells whether we should check for unused import in __init__ files.
 init-import=yes
@@ -14,5 +18,7 @@ init-import=yes
 max-locals=25
 # Maximum number of branch for function / method body
 max-branches=20
+# Maximum number of instance attributes / method body
+instance-attributes=20
 [SIMILARITIES]
 min-similarity-lines=10

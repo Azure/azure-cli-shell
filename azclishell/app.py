@@ -39,6 +39,8 @@ from prompt_toolkit.shortcuts import create_eventloop
 from six.moves import configparser
 
 SHELL_CONFIGURATION = azclishell.configuration.CONFIGURATION
+SHELL_CONFIG_DIR = azclishell.configuration.get_config_dir
+
 NOTIFICATIONS = ""
 PROFILE = Profile()
 SELECT_SYMBOL = azclishell.configuration.SELECT_SYMBOL
@@ -103,10 +105,23 @@ def _toolbar_info():
     ]
     return settings_items
 
+def space_toolbar(settings_items, cols, empty_space):
+    """ formats the toolbar """
+    counter = 0
+    for part in settings_items:
+        counter += len(part)
+    spacing = empty_space[:int(math.floor((cols - counter) / (len(settings_items) - 1)))]
 
+    settings = spacing.join(settings_items)
+
+    empty_space = empty_space[len(NOTIFICATIONS) + len(settings) + 1:]
+    return settings, empty_space
+
+# pylint: disable=too-many-instance-attributes
 class Shell(object):
     """ represents the shell """
 
+    # pylint: disable=too-many-arguments
     def __init__(self, completer=None, styles=None,
                  lexer=None, history=InMemoryHistory(),
                  app=None, input_custom=sys.stdout, output_custom=None):
@@ -149,7 +164,7 @@ class Shell(object):
         document = cli.current_buffer.document
         text = document.text
         empty_space = ""
-        for i in range(cols):
+        for i in range(cols):  # pylint: disable=unused-variable
             empty_space += " "
 
         text = text.replace('az', '')
@@ -163,7 +178,7 @@ class Shell(object):
 
         self._update_default_info()
 
-        settings, empty_space = self.space_toolbar(_toolbar_info(), cols, empty_space)
+        settings, empty_space = space_toolbar(_toolbar_info(), cols, empty_space)
 
         cli.buffers['description'].reset(
             initial_document=Document(self.description_docs, cursor_position=0))
@@ -225,18 +240,6 @@ class Shell(object):
                 self.config_default += opt + ": " + az_config.get(DEFAULTS_SECTION, opt) + "  "
         except configparser.NoSectionError:
             self.config_default = ""
-
-    def space_toolbar(self, settings_items, cols, empty_space):
-        """ formats the toolbar """
-        counter = 0
-        for part in settings_items:
-            counter += len(part)
-        spacing = empty_space[:int(math.floor((cols - counter) / (len(settings_items) - 1)))]
-
-        settings = spacing.join(settings_items)
-
-        empty_space = empty_space[len(NOTIFICATIONS) + len(settings) + 1:]
-        return settings, empty_space
 
     def create_application(self, full_layout=True):
         """ makes the application object and the buffers """
@@ -373,6 +376,7 @@ class Shell(object):
 
         return cmd
 
+    # pylint: disable=too-many-branches
     def _special_cases(self, text, cmd, outside):
         break_flag = False
         continue_flag = False
@@ -388,7 +392,7 @@ class Shell(object):
             outside = True
             cmd = 'echo -n "" >' +\
                 os.path.join(
-                    SHELL_CONFIGURATION.get_config_dir(),
+                    SHELL_CONFIG_DIR(),
                     SHELL_CONFIGURATION.get_history())
         if '--version' in text:
             try:
@@ -410,24 +414,7 @@ class Shell(object):
                 telemetry.track_ssg('exit code', cmd)
 
             elif text[0] == SELECT_SYMBOL['query']:  # query previous output
-                if self.last and self.last.result:
-                    if hasattr(self.last.result, '__dict__'):
-                        input_dict = dict(self.last.result)
-                    else:
-                        input_dict = self.last.result
-                    try:
-                        query_text = text.partition(SELECT_SYMBOL['query'])[2]
-                        if query_text:
-                            result = jmespath.search(
-                                query_text, input_dict)
-                            if isinstance(result, str):
-                                print(result)
-                            else:
-                                print(json.dumps(result, sort_keys=True, indent=2))
-                    except jmespath.exceptions.ParseError:
-                        print("Invalid Query")
-                continue_flag = True
-                telemetry.track_ssg('query', text)
+                continue_flag = self.handle_jmespath_query(text, continue_flag)
 
             elif "|" in text or ">" in text:  # anything I don't parse, send off
                 outside = True
@@ -437,6 +424,33 @@ class Shell(object):
                 cmd = self.handle_example(cmd)
                 telemetry.track_ssg('tutorial', text)
 
+        continue_flag, cmd = self.handle_scoping_input(continue_flag, cmd, text)
+
+        return break_flag, continue_flag, outside, cmd
+
+    def handle_jmespath_query(self, text, continue_flag):
+        if self.last and self.last.result:
+            if hasattr(self.last.result, '__dict__'):
+                input_dict = dict(self.last.result)
+            else:
+                input_dict = self.last.result
+            try:
+                query_text = text.partition(SELECT_SYMBOL['query'])[2]
+                result = ""
+                if query_text:
+                    result = jmespath.search(
+                        query_text, input_dict)
+                if isinstance(result, str):
+                    print(result)
+                else:
+                    print(json.dumps(result, sort_keys=True, indent=2))
+            except jmespath.exceptions.ParseError:
+                print("Invalid Query")
+        continue_flag = True
+        telemetry.track_ssg('query', text)
+        return continue_flag
+
+    def handle_scoping_input(self, continue_flag, cmd, text):
         if SELECT_SYMBOL['default'] in text:
             default = text.partition(SELECT_SYMBOL['default'])[2].split()
             value = self.handle_scoping(default)
@@ -459,7 +473,39 @@ class Shell(object):
                 print('undefaulting: ' + value[0])
             cmd = cmd.replace(SELECT_SYMBOL['undefault'], '')
             continue_flag = True
-        return break_flag, continue_flag, outside, cmd
+        return continue_flag, cmd
+
+    def cli_execute(self, cmd):
+        try:
+            args = parse_quotes(cmd)
+            azlogging.configure_logging(args)
+
+            azure_folder = get_config_dir()
+            if not os.path.exists(azure_folder):
+                os.makedirs(azure_folder)
+            ACCOUNT.load(os.path.join(azure_folder, 'azureProfile.json'))
+            CONFIG.load(os.path.join(azure_folder, 'az.json'))
+            SESSION.load(os.path.join(azure_folder, 'az.sess'), max_age=3600)
+
+            config = Configuration(args)
+            self.app.initialize(config)
+
+            result = self.app.execute(args)
+            self.last_exit = 0
+            if result and result.result is not None:
+                from azure.cli.core._output import OutputProducer
+                if self.output:
+                    self.output.out(result)
+                else:
+                    formatter = OutputProducer.get_formatter(
+                        self.app.configuration.output_format)
+                    OutputProducer(formatter=formatter, file=sys.stdout).out(result)
+                    self.last = result
+
+        except Exception as ex:  # pylint: disable=broad-except
+            self.last_exit = handle_exception(ex)
+        except SystemExit as ex:
+            self.last_exit = int(ex.code)
 
     def run(self):
 
@@ -495,36 +541,7 @@ class Shell(object):
                 if outside:
                     subprocess.Popen(cmd, shell=True).communicate()
                 else:
-                    try:
-                        args = parse_quotes(cmd)
-                        azlogging.configure_logging(args)
-
-                        azure_folder = get_config_dir()
-                        if not os.path.exists(azure_folder):
-                            os.makedirs(azure_folder)
-                        ACCOUNT.load(os.path.join(azure_folder, 'azureProfile.json'))
-                        CONFIG.load(os.path.join(azure_folder, 'az.json'))
-                        SESSION.load(os.path.join(azure_folder, 'az.sess'), max_age=3600)
-
-                        config = Configuration(args)
-                        self.app.initialize(config)
-
-                        result = self.app.execute(args)
-                        self.last_exit = 0
-                        if result and result.result is not None:
-                            from azure.cli.core._output import OutputProducer
-                            if self.output:
-                                self.output.out(result)
-                            else:
-                                formatter = OutputProducer.get_formatter(
-                                    self.app.configuration.output_format)
-                                OutputProducer(formatter=formatter, file=sys.stdout).out(result)
-                                self.last = result
-
-                    except Exception as ex:  # pylint: disable=broad-except
-                        self.last_exit = handle_exception(ex)
-                    except SystemExit as ex:
-                        self.last_exit = ex.code
+                    self.cli_execute(cmd)
 
         print('Have a lovely day!!')
         telemetry.conclude()

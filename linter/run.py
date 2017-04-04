@@ -4,7 +4,6 @@
 # --------------------------------------------------------------------------------------------
 
 import argparse
-import multiprocessing
 import os.path
 import sys
 from subprocess import call
@@ -15,11 +14,7 @@ import linter.path as automation_path
 def run_pylint():
     print('\n\nRun pylint')
 
-    modules_list = ' '.join(os.path.join('azclishell'))
-    arguments = '{} --rcfile={} -j {} -r n -d I0013'.format(
-        modules_list,
-        os.path.join(automation_path.get_repo_root(), 'pylintrc'),
-        multiprocessing.cpu_count())
+    arguments = 'azclishell'
 
     return_code = call(('python -m pylint ' + arguments).split())
 

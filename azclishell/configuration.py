@@ -38,7 +38,7 @@ def help_text(values):
 
 SHELL_HELP = help_text(GESTURE_INFO)
 
-class Configuration():
+class Configuration(object):
     """ configuration for program """
     BOOLEAN_STATES = {'1': True, 'yes': True, 'true': True, 'on': True,
                       '0': False, 'no': False, 'false': False, 'off': False,
@@ -58,15 +58,15 @@ class Configuration():
         self.config.set('Layout', 'param_description', 'yes')
         self.config.set('Layout', 'examples', 'yes')
 
-        azure_folder = self.get_config_dir()
+        azure_folder = get_config_dir()
         if not os.path.exists(azure_folder):
             os.makedirs(azure_folder)
-        if not os.path.exists(os.path.join(self.get_config_dir(), CONFIG_FILE_NAME)):
-            with open(os.path.join(self.get_config_dir(), CONFIG_FILE_NAME), 'w') as config_file:
+        if not os.path.exists(os.path.join(get_config_dir(), CONFIG_FILE_NAME)):
+            with open(os.path.join(get_config_dir(), CONFIG_FILE_NAME), 'w') as config_file:
                 self.config.write(config_file)
         else:
-            with open(os.path.join(self.get_config_dir(), CONFIG_FILE_NAME), 'r') as config_file:
-                self.config.readfp(config_file)
+            with open(os.path.join(get_config_dir(), CONFIG_FILE_NAME), 'r') as config_file:
+                self.config.readfp(config_file)  # pylint: disable=deprecated-method
                 self.update()
 
     def get_history(self):
@@ -86,13 +86,6 @@ class Configuration():
         self.config.set('DEFAULT', 'firsttime', 'no')
         self.update()
 
-    def get_config_dir(self):
-        """ gets the directory of the configuration """
-        if os.getenv('AZURE_CONFIG_DIR'):
-            return os.getenv('AZURE_CONFIG_DIR')
-        else:
-            return os.path.expanduser(os.path.join('~', '.azure-shell'))
-
     def set_val(self, direct, section, val):
         """ set the config values """
         self.config.set(direct, section, val)
@@ -100,8 +93,13 @@ class Configuration():
 
     def update(self):
         """ updates the configuration settings """
-        with open(os.path.join(self.get_config_dir(), CONFIG_FILE_NAME), 'w') as config_file:
+        with open(os.path.join(get_config_dir(), CONFIG_FILE_NAME), 'w') as config_file:
             self.config.write(config_file)
 
-
+def get_config_dir():
+    """ gets the directory of the configuration """
+    if os.getenv('AZURE_CONFIG_DIR'):
+        return os.getenv('AZURE_CONFIG_DIR')
+    else:
+        return os.path.expanduser(os.path.join('~', '.azure-shell'))
 CONFIGURATION = Configuration()

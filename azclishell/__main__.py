@@ -45,6 +45,7 @@ def main(args):
     SESSION.load(os.path.join(azure_folder, 'az.sess'), max_age=3600)
 
     config = SHELL_CONFIGURATION
+    shell_config_dir = azclishell.configuration.get_config_dir
 
     if config.BOOLEAN_STATES[config.config.get('DEFAULT', 'firsttime')]:
         print("When in doubt, ask for 'help'")
@@ -54,7 +55,7 @@ def main(args):
         completer=AZCOMPLETER,
         lexer=AzLexer,
         history=FileHistory(
-            os.path.join(SHELL_CONFIGURATION.get_config_dir(), config.get_history())),
+            os.path.join(shell_config_dir(), config.get_history())),
         app=APPLICATION,
         styles=style
     )

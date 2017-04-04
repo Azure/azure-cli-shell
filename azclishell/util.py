@@ -1,6 +1,5 @@
 """ utility functions """
 
-import collections
 import os
 import sys
 import platform
@@ -27,7 +26,7 @@ def _size_27():
 
 def _size_36_windows():
     """ returns the rows, columns of terminal """
-    from shutil import get_terminal_size
+    from shutil import get_terminal_size # pylint: disable=no-name-in-module
     dim = get_terminal_size()
     return dim.lines, dim.columns
 

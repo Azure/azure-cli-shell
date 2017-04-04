@@ -23,11 +23,10 @@ from pygments.lexer import Lexer as PygLex
 MAX_COMPLETION = 16
 DEFAULT_COMMAND = ""
 
-
+# pylint: disable=too-few-public-methods
 class HasDefaultScope(Filter):
     """ if there is a scope on the input """
     def __call__(self, *a, **kw):
-        global DEFAULT_COMMAND
         return DEFAULT_COMMAND == ""
 
 # TODO fix this somehow
@@ -45,13 +44,13 @@ input_processors = [
         AppendAutoSuggestion(), HasFocus(DEFAULT_BUFFER) & HasDefaultScope()),
 ]
 
-
+# pylint: disable=too-few-public-methods
 class ShowDefault(Filter):
     """ toggle on and off seeing the default """
     def __call__(self, *a, **kw):
         return get_show_default()
 
-
+# pylint: disable=too-few-public-methods
 class ShowSymbol(Filter):
     """ toggle showing the symbols """
     def __call__(self, *a, **kw):

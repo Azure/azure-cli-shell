@@ -15,13 +15,7 @@ import azclishell.configuration as config
 
 CMD_TABLE = APPLICATION.configuration.get_command_table()
 
-
-def dump_command_table():
-    """ dumps the command table """
-    global CMD_TABLE
-
-    command_file = config.CONFIGURATION.get_help_files()
-
+def install_modules():
     for cmd in CMD_TABLE:
         CMD_TABLE[cmd].load_arguments()
 
@@ -34,9 +28,15 @@ def dump_command_table():
     for mod in installed_command_modules:
         try:
             import_module('azure.cli.command_modules.' + mod).load_params(mod)
-        except Exception as ex:
+        except Exception:  # pylint: disable=broad-except
             print("Error loading: {}".format(mod))
     _update_command_definitions(CMD_TABLE)
+
+def dump_command_table():
+    """ dumps the command table """
+    command_file = config.CONFIGURATION.get_help_files()
+
+    install_modules()
 
     data = {}
     for cmd in CMD_TABLE:
@@ -108,7 +108,7 @@ def dump_command_table():
 
 def get_cache_dir():
     """ gets the location of the cache """
-    azure_folder = config.CONFIGURATION.get_config_dir()
+    azure_folder = config.get_config_dir()
     cache_path = os.path.join(azure_folder, 'cache')
     if not os.path.exists(azure_folder):
         os.makedirs(azure_folder)
