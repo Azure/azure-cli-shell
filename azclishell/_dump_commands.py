@@ -32,7 +32,7 @@ def dump_command_table():
     for mod in installed_command_modules:
         try:
             import_module('azure.cli.command_modules.' + mod).load_params(mod)
-        except Exception as ex:
+        except Exception:  # pylint: disable=broad-except
             print("Error loading: {}".format(mod))
     _update_command_definitions(CMD_TABLE)
 

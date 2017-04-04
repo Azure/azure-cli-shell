@@ -27,7 +27,6 @@ DEFAULT_COMMAND = ""
 class HasDefaultScope(Filter):
     """ if there is a scope on the input """
     def __call__(self, *a, **kw):
-        global DEFAULT_COMMAND
         return DEFAULT_COMMAND == ""
 
 # TODO fix this somehow
