@@ -16,8 +16,6 @@ import azclishell.configuration as config
 CMD_TABLE = APPLICATION.configuration.get_command_table()
 
 def install_modules():
-    command_file = config.CONFIGURATION.get_help_files()
-
     for cmd in CMD_TABLE:
         CMD_TABLE[cmd].load_arguments()
 
@@ -36,6 +34,8 @@ def install_modules():
 
 def dump_command_table():
     """ dumps the command table """
+    command_file = config.CONFIGURATION.get_help_files()
+
     install_modules()
 
     data = {}

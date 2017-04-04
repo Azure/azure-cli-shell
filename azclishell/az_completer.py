@@ -137,73 +137,75 @@ class AzCompleter(Completer):
         for param in self.gen_global_param_completions(text):
             yield param
 
+    def gen_enum_completions(self, arg_name, text, started_param, prefix):
+        try:  # if enum completion
+            for choice in self.cmdtab[
+                    self.curr_command].arguments[arg_name].choices:
+                if started_param:
+                    if choice.lower().startswith(prefix.lower())\
+                    and choice not in text.split():
+                        yield Completion(choice, -len(prefix))
+                else:
+                    yield Completion(choice, -len(prefix))
+
+        except TypeError: # there is no choices option
+            pass
+
+    def get_arg_name(self, is_param, param):
+        if self.curr_command in self.cmdtab and is_param:
+            for arg in self.cmdtab[self.curr_command].arguments:
+
+                for name in self.cmdtab[self.curr_command].arguments[arg].options_list:
+                    if name == param:
+                        return arg
+
+    # pylint: disable=too-many-branches
     def gen_dynamic_completions(self, text):
         """ generates the dynamic values, like the names of resource groups """
         try:
             is_param, started_param, prefix, param = dynamic_param_logic(text)
 
             # dynamic param completion
-            arg_name = ""
-            if self.curr_command in self.cmdtab and is_param:
-                for arg in self.cmdtab[self.curr_command].arguments:
+            arg_name = self.get_arg_name(is_param, param)
 
-                    for name in self.cmdtab[self.curr_command].arguments[arg].options_list:
-                        if name == param:
-                            arg_name = arg
-                            break
+            if arg_name and (text.split()[-1].startswith('-') or\
+            text.split()[-2].startswith('-')):
+                self.gen_enum_completions(arg_name, text, started_param, prefix)
 
-                    if arg_name:
-                        break
+                parse_args = self.argsfinder.get_parsed_args(
+                    parse_quotes(text, quotes=False))
 
-                if arg_name and (text.split()[-1].startswith('-') or\
-                text.split()[-2].startswith('-')):
-                    try:  # if enum completion
-                        for choice in self.cmdtab[
-                                self.curr_command].arguments[arg_name].choices:
-                            if started_param:
-                                if choice.lower().startswith(prefix.lower())\
-                                and choice not in text.split():
-                                    yield Completion(choice, -len(prefix))
-                            else:
-                                yield Completion(choice, -len(prefix))
+                # there are 3 formats for completers the cli uses
+                # this try catches which format it is
+                if self.cmdtab[self.curr_command].arguments[arg_name].completer:
+                    try:
+                        for comp in self.cmdtab[self.curr_command].\
+                        arguments[arg_name].completer(prefix=prefix, action=None,\
+                        parser=None, parsed_args=parse_args):
 
-                    except TypeError: # there is no choices option
-                        pass
+                            for comp in gen_dyn_completion(
+                                    comp, started_param, prefix, text):
+                                yield comp
 
-                    parse_args = self.argsfinder.get_parsed_args(
-                        parse_quotes(text, quotes=False))
-
-                    # there are 3 formats for completers the cli uses
-                    # this try catches which format it is
-                    if self.cmdtab[self.curr_command].arguments[arg_name].completer:
+                    except TypeError:
                         try:
                             for comp in self.cmdtab[self.curr_command].\
-                            arguments[arg_name].completer(prefix=prefix, action=None,\
-                            parser=None, parsed_args=parse_args):
+                            arguments[arg_name].completer(prefix):
 
                                 for comp in gen_dyn_completion(
                                         comp, started_param, prefix, text):
                                     yield comp
-
                         except TypeError:
                             try:
                                 for comp in self.cmdtab[self.curr_command].\
-                                arguments[arg_name].completer(prefix):
+                                arguments[arg_name].completer():
 
                                     for comp in gen_dyn_completion(
                                             comp, started_param, prefix, text):
                                         yield comp
+
                             except TypeError:
-                                try:
-                                    for comp in self.cmdtab[self.curr_command].\
-                                    arguments[arg_name].completer():
-
-                                        for comp in gen_dyn_completion(
-                                                comp, started_param, prefix, text):
-                                            yield comp
-
-                                except TypeError:
-                                    print("TypeError: " + TypeError.message)
+                                print("TypeError: " + TypeError.message)
 
         except CLIError:  # if the user isn't logged in
             pass
@@ -224,18 +226,15 @@ class AzCompleter(Completer):
 
     def gen_cmd_and_param_completions(self, text):
         """ generates command and parameter completions """
-        temp_command = ''
+        temp_command = str('')
         for word in text.split():
             if word.startswith("-"):
                 self._is_command = False
+            else:
+                temp_command = ' ' + str(word) if temp_command else str(word)
 
             if self.branch.has_child(word):
                 self.branch = self.branch.get_child(word, self.branch.children)
-            if self._is_command:
-                if temp_command:
-                    temp_command += " " + str(word)
-                else:
-                    temp_command = str(word)
 
         if len(text) > 0 and text[-1].isspace():
             if in_tree(self.command_tree, temp_command):

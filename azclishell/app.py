@@ -117,6 +117,7 @@ def space_toolbar(settings_items, cols, empty_space):
     empty_space = empty_space[len(NOTIFICATIONS) + len(settings) + 1:]
     return settings, empty_space
 
+# pylint: disable=too-many-instance-attributes
 class Shell(object):
     """ represents the shell """
 
@@ -419,13 +420,14 @@ class Shell(object):
                         input_dict = self.last.result
                     try:
                         query_text = text.partition(SELECT_SYMBOL['query'])[2]
+                        result = ""
                         if query_text:
                             result = jmespath.search(
                                 query_text, input_dict)
-                            if isinstance(result, str):
-                                print(result)
-                            else:
-                                print(json.dumps(result, sort_keys=True, indent=2))
+                        if isinstance(result, str):
+                            print(result)
+                        else:
+                            print(json.dumps(result, sort_keys=True, indent=2))
                     except jmespath.exceptions.ParseError:
                         print("Invalid Query")
                 continue_flag = True
@@ -463,6 +465,38 @@ class Shell(object):
             continue_flag = True
         return break_flag, continue_flag, outside, cmd
 
+    def cli_execute(self, cmd):
+        try:
+            args = parse_quotes(cmd)
+            azlogging.configure_logging(args)
+
+            azure_folder = get_config_dir()
+            if not os.path.exists(azure_folder):
+                os.makedirs(azure_folder)
+            ACCOUNT.load(os.path.join(azure_folder, 'azureProfile.json'))
+            CONFIG.load(os.path.join(azure_folder, 'az.json'))
+            SESSION.load(os.path.join(azure_folder, 'az.sess'), max_age=3600)
+
+            config = Configuration(args)
+            self.app.initialize(config)
+
+            result = self.app.execute(args)
+            self.last_exit = 0
+            if result and result.result is not None:
+                from azure.cli.core._output import OutputProducer
+                if self.output:
+                    self.output.out(result)
+                else:
+                    formatter = OutputProducer.get_formatter(
+                        self.app.configuration.output_format)
+                    OutputProducer(formatter=formatter, file=sys.stdout).out(result)
+                    self.last = result
+
+        except Exception as ex:  # pylint: disable=broad-except
+            self.last_exit = handle_exception(ex)
+        except SystemExit as ex:
+            self.last_exit = int(ex.code)
+
     def run(self):
 
         telemetry.start()
@@ -497,36 +531,7 @@ class Shell(object):
                 if outside:
                     subprocess.Popen(cmd, shell=True).communicate()
                 else:
-                    try:
-                        args = parse_quotes(cmd)
-                        azlogging.configure_logging(args)
-
-                        azure_folder = get_config_dir()
-                        if not os.path.exists(azure_folder):
-                            os.makedirs(azure_folder)
-                        ACCOUNT.load(os.path.join(azure_folder, 'azureProfile.json'))
-                        CONFIG.load(os.path.join(azure_folder, 'az.json'))
-                        SESSION.load(os.path.join(azure_folder, 'az.sess'), max_age=3600)
-
-                        config = Configuration(args)
-                        self.app.initialize(config)
-
-                        result = self.app.execute(args)
-                        self.last_exit = 0
-                        if result and result.result is not None:
-                            from azure.cli.core._output import OutputProducer
-                            if self.output:
-                                self.output.out(result)
-                            else:
-                                formatter = OutputProducer.get_formatter(
-                                    self.app.configuration.output_format)
-                                OutputProducer(formatter=formatter, file=sys.stdout).out(result)
-                                self.last = result
-
-                    except Exception as ex:  # pylint: disable=broad-except
-                        self.last_exit = handle_exception(ex)
-                    except SystemExit as ex:
-                        self.last_exit = int(ex.code)
+                    self.cli_execute(cmd)
 
         print('Have a lovely day!!')
         telemetry.conclude()

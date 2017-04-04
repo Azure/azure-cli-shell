@@ -48,7 +48,7 @@ def add_random_new_lines(long_phrase, line_min=LINE_MINIMUM, tolerance=TOLERANCE
         counter += 1
     return long_phrase + "\n"
 
-
+# pylint: disable=too-many-instance-attributes
 class GatherCommands(object):
     """ grabs all the cached commands from files """
     def __init__(self):
