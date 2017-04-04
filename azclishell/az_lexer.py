@@ -1,4 +1,8 @@
-""" highlighting and colors """
+# --------------------------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
+
 from azclishell.gather_commands import GatherCommands
 
 from pygments.lexer import RegexLexer, words

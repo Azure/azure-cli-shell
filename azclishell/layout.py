@@ -1,3 +1,7 @@
+# --------------------------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
 
 import azclishell.configuration
 from azclishell.key_bindings import get_show_default, get_symbols
