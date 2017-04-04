@@ -18,8 +18,6 @@ CMD_TABLE = APPLICATION.configuration.get_command_table()
 
 def dump_command_table():
     """ dumps the command table """
-    global CMD_TABLE
-
     command_file = config.CONFIGURATION.get_help_files()
 
     for cmd in CMD_TABLE:

@@ -5,7 +5,8 @@
 # I0011 Warning locally suppressed using disable-msg
 # W0511 fixme
 # R0401 Cyclic import (because of https://github.com/PyCQA/pylint/issues/850)
-disable=C0111,C0103,I0011,W0511,R0401
+# W0603 global var
+disable=C0111,C0103,I0011,W0511,R0401,W0603
 [VARIABLES]
 # Tells whether we should check for unused import in __init__ files.
 init-import=yes
