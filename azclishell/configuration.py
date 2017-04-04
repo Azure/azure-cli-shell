@@ -37,7 +37,7 @@ def help_text(values):
     result = ""
     for key in values:
         result += key + ' '.join('' for x in range(GESTURE_LENGTH - len(key))) +\
-                  ': ' + values[key] + '\n'
+                        ': ' + values[key] + '\n'
     return result
 
 

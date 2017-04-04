@@ -132,7 +132,9 @@ def create_tutorial_layout(lex):
                           max_height=MAX_COMPLETION,
                           scroll_offset=1,
                           extra_filter=(HasFocus(DEFAULT_BUFFER))
-                          ))]
+                          )
+                     )
+            ]
         ),
         ConditionalContainer(
             HSplit([
@@ -223,7 +225,9 @@ def create_layout(lex, exam_lex, toolbar_lex):
                           max_height=MAX_COMPLETION,
                           scroll_offset=1,
                           extra_filter=(HasFocus(DEFAULT_BUFFER))
-                          ))]
+                      )
+                     )
+            ]
         ),
         layout_lower
     ])
