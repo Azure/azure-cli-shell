@@ -16,3 +16,4 @@ else
     python -m unittest discover -s test -p 'test_*.py'
 fi
 
+python $scripts_root/license-check/verify.py
