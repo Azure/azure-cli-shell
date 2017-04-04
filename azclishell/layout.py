@@ -224,9 +224,7 @@ def create_layout(lex, exam_lex, toolbar_lex):
                       content=CompletionsMenu(
                           max_height=MAX_COMPLETION,
                           scroll_offset=1,
-                          extra_filter=(HasFocus(DEFAULT_BUFFER))
-                      )
-                     )
+                          extra_filter=(HasFocus(DEFAULT_BUFFER))))
             ]
         ),
         layout_lower
