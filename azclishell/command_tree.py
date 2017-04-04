@@ -8,7 +8,7 @@ class CommandTree(object):
         else:
             self.children = children
 
-    def get_child(self, child_name, kids):
+    def get_child(self, child_name, kids):  # pylint: disable=no-self-use
         """ returns the object with the name supplied """
         for kid in kids:
             if kid.data == child_name:

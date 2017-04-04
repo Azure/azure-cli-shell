@@ -39,6 +39,8 @@ from prompt_toolkit.shortcuts import create_eventloop
 from six.moves import configparser
 
 SHELL_CONFIGURATION = azclishell.configuration.CONFIGURATION
+SHELL_CONFIG_DIR = azclishell.configuration.get_config_dir
+
 NOTIFICATIONS = ""
 PROFILE = Profile()
 SELECT_SYMBOL = azclishell.configuration.SELECT_SYMBOL
@@ -103,6 +105,17 @@ def _toolbar_info():
     ]
     return settings_items
 
+def space_toolbar(settings_items, cols, empty_space):
+    """ formats the toolbar """
+    counter = 0
+    for part in settings_items:
+        counter += len(part)
+    spacing = empty_space[:int(math.floor((cols - counter) / (len(settings_items) - 1)))]
+
+    settings = spacing.join(settings_items)
+
+    empty_space = empty_space[len(NOTIFICATIONS) + len(settings) + 1:]
+    return settings, empty_space
 
 class Shell(object):
     """ represents the shell """
@@ -149,7 +162,7 @@ class Shell(object):
         document = cli.current_buffer.document
         text = document.text
         empty_space = ""
-        for i in range(cols):
+        for i in range(cols):  # pylint: disable=unused-variable
             empty_space += " "
 
         text = text.replace('az', '')
@@ -163,7 +176,7 @@ class Shell(object):
 
         self._update_default_info()
 
-        settings, empty_space = self.space_toolbar(_toolbar_info(), cols, empty_space)
+        settings, empty_space = space_toolbar(_toolbar_info(), cols, empty_space)
 
         cli.buffers['description'].reset(
             initial_document=Document(self.description_docs, cursor_position=0))
@@ -225,18 +238,6 @@ class Shell(object):
                 self.config_default += opt + ": " + az_config.get(DEFAULTS_SECTION, opt) + "  "
         except configparser.NoSectionError:
             self.config_default = ""
-
-    def space_toolbar(self, settings_items, cols, empty_space):
-        """ formats the toolbar """
-        counter = 0
-        for part in settings_items:
-            counter += len(part)
-        spacing = empty_space[:int(math.floor((cols - counter) / (len(settings_items) - 1)))]
-
-        settings = spacing.join(settings_items)
-
-        empty_space = empty_space[len(NOTIFICATIONS) + len(settings) + 1:]
-        return settings, empty_space
 
     def create_application(self, full_layout=True):
         """ makes the application object and the buffers """
@@ -388,7 +389,7 @@ class Shell(object):
             outside = True
             cmd = 'echo -n "" >' +\
                 os.path.join(
-                    SHELL_CONFIGURATION.get_config_dir(),
+                    SHELL_CONFIG_DIR(),
                     SHELL_CONFIGURATION.get_history())
         if '--version' in text:
             try:
@@ -524,7 +525,7 @@ class Shell(object):
                     except Exception as ex:  # pylint: disable=broad-except
                         self.last_exit = handle_exception(ex)
                     except SystemExit as ex:
-                        self.last_exit = ex.code
+                        self.last_exit = int(ex.code)
 
         print('Have a lovely day!!')
         telemetry.conclude()

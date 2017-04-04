@@ -18,6 +18,40 @@ OUTPUT_CHOICES = ['json', 'tsv', 'table', 'jsonc']
 OUTPUT_OPTIONS = ['--output', '-o']
 GLOBAL_PARAM = OUTPUT_OPTIONS + ['--verbose', '--debug']
 
+def dynamic_param_logic(text):
+    """ validates parameter values for dynamic completion """
+    is_param = False
+    started_param = False
+    prefix = ""
+    param = ""
+    if text.split():
+        param = text.split()[-1]
+        if param.startswith("-"):
+            is_param = True
+        elif len(text.split()) > 2 and text.split()[-2]\
+        and text.split()[-2].startswith('-'):
+            is_param = True
+            param = text.split()[-2]
+            started_param = True
+            prefix = text.split()[-1]
+    return is_param, started_param, prefix, param
+
+
+def reformat_cmd(text):
+    """ reformat the text to be stripped of noise """
+    # remove az if there
+    text = text.replace('az', '')
+    # disregard defaulting symbols
+    if SELECT_SYMBOL['default'] in text:
+        text = text.replace(SELECT_SYMBOL['default'], "")
+
+    if SELECT_SYMBOL['undefault'] in text:
+        text = text.replace(SELECT_SYMBOL['undefault'], "")
+
+    if get_scope():
+        text = get_scope() + ' ' + text
+    return text
+
 
 class AzCompleter(Completer):
     """ Completes Azure CLI commands """
@@ -66,38 +100,7 @@ class AzCompleter(Completer):
                 (not (double and param in self.same_param_doubles)\
                 or self.same_param_doubles[param] not in text_before_cursor.split())
 
-    def dynamic_param_logic(self, text):
-        """ validates parameter values for dynamic completion """
-        is_param = False
-        started_param = False
-        prefix = ""
-        param = ""
-        if text.split():
-            param = text.split()[-1]
-            if param.startswith("-"):
-                is_param = True
-            elif len(text.split()) > 2 and text.split()[-2]\
-            and text.split()[-2].startswith('-'):
-                is_param = True
-                param = text.split()[-2]
-                started_param = True
-                prefix = text.split()[-1]
-        return is_param, started_param, prefix, param
 
-    def reformat_cmd(self, text):
-        """ reformat the text to be stripped of noise """
-        # remove az if there
-        text = text.replace('az', '')
-        # disregard defaulting symbols
-        if SELECT_SYMBOL['default'] in text:
-            text = text.replace(SELECT_SYMBOL['default'], "")
-
-        if SELECT_SYMBOL['undefault'] in text:
-            text = text.replace(SELECT_SYMBOL['undefault'], "")
-
-        if get_scope():
-            text = get_scope() + ' ' + text
-        return text
 
     def get_completions(self, document, complete_event):
         text = document.text_before_cursor
@@ -105,7 +108,7 @@ class AzCompleter(Completer):
         self.curr_command = ''
         self._is_command = True
 
-        text = self.reformat_cmd(text)
+        text = reformat_cmd(text)
 
         if text.split():
             for comp in self.gen_cmd_and_param_completions(text):
@@ -123,7 +126,7 @@ class AzCompleter(Completer):
     def gen_dynamic_completions(self, text):
         """ generates the dynamic values, like the names of resource groups """
         try:
-            is_param, started_param, prefix, param = self.dynamic_param_logic(text)
+            is_param, started_param, prefix, param = dynamic_param_logic(text)
 
             # dynamic param completion
             arg_name = ""

@@ -106,7 +106,7 @@ def dump_command_table():
 
 def get_cache_dir():
     """ gets the location of the cache """
-    azure_folder = config.CONFIGURATION.get_config_dir()
+    azure_folder = config.get_config_dir()
     cache_path = os.path.join(azure_folder, 'cache')
     if not os.path.exists(azure_folder):
         os.makedirs(azure_folder)
