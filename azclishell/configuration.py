@@ -66,7 +66,7 @@ class Configuration(object):
                 self.config.write(config_file)
         else:
             with open(os.path.join(get_config_dir(), CONFIG_FILE_NAME), 'r') as config_file:
-                self.config.readfp(config_file)
+                self.config.readfp(config_file)  # pylint: disable=deprecated-method
                 self.update()
 
     def get_history(self):
