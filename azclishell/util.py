@@ -26,7 +26,7 @@ def _size_27():
 
 def _size_36_windows():
     """ returns the rows, columns of terminal """
-    from shutil import get_terminal_size # pylint: disable=no-name-in-module
+    from shutil import get_terminal_size  # pylint: disable=no-name-in-module
     dim = get_terminal_size()
     if isinstance(dim, list):
         return dim[0], dim[1]

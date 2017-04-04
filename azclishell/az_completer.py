@@ -30,7 +30,7 @@ def dynamic_param_logic(text):
         if param.startswith("-"):
             is_param = True
         elif len(text.split()) > 2 and text.split()[-2]\
-             and text.split()[-2].startswith('-'):
+                and text.split()[-2].startswith('-'):
             is_param = True
             param = text.split()[-2]
             started_param = True
@@ -109,12 +109,11 @@ class AzCompleter(Completer):
     def validate_completion(self, param, words, text_before_cursor, double=True):
         """ validates that a param should be completed """
         return param.lower().startswith(words.lower()) and \
-               param.lower() != words.lower() and\
-               param not in text_before_cursor.split()\
-               and not text_before_cursor[-1].isspace() and\
-               (not (double and param in self.same_param_doubles)
-                or self.same_param_doubles[param] not in text_before_cursor.split())
-
+                param.lower() != words.lower() and\
+                param not in text_before_cursor.split()\
+                and not text_before_cursor[-1].isspace() and\
+                (not (double and param in self.same_param_doubles)
+                 or self.same_param_doubles[param] not in text_before_cursor.split())
 
     def get_completions(self, document, complete_event):
         text = document.text_before_cursor
@@ -180,9 +179,9 @@ class AzCompleter(Completer):
                 if self.cmdtab[self.curr_command].arguments[arg_name].completer:
                     try:
                         for comp in self.cmdtab[self.curr_command].\
-                        arguments[arg_name].completer(
-                                prefix=prefix, action=None,
-                                parser=None, parsed_args=parse_args):
+                            arguments[arg_name].completer(
+                                    prefix=prefix, action=None,
+                                    parser=None, parsed_args=parse_args):
 
                             for comp in gen_dyn_completion(
                                     comp, started_param, prefix, text):
@@ -191,7 +190,7 @@ class AzCompleter(Completer):
                     except TypeError:
                         try:
                             for comp in self.cmdtab[self.curr_command].\
-                            arguments[arg_name].completer(prefix):
+                                arguments[arg_name].completer(prefix):
 
                                 for comp in gen_dyn_completion(
                                         comp, started_param, prefix, text):
@@ -199,7 +198,7 @@ class AzCompleter(Completer):
                         except TypeError:
                             try:
                                 for comp in self.cmdtab[self.curr_command].\
-                                arguments[arg_name].completer():
+                                   arguments[arg_name].completer():
 
                                     for comp in gen_dyn_completion(
                                             comp, started_param, prefix, text):

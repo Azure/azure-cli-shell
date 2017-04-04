@@ -29,14 +29,17 @@ CONFIG_FILE_NAME = 'shell-config'
 
 GESTURE_LENGTH = 20
 
+
 def help_text(values):
     result = ""
     for key in values:
         result += key + ' '.join('' for x in range(GESTURE_LENGTH - len(key))) +\
-                  ': ' + values[key] + '\n'
+                    ': ' + values[key] + '\n'
     return result
 
+
 SHELL_HELP = help_text(GESTURE_INFO)
+
 
 class Configuration(object):
     """ configuration for program """
@@ -96,10 +99,13 @@ class Configuration(object):
         with open(os.path.join(get_config_dir(), CONFIG_FILE_NAME), 'w') as config_file:
             self.config.write(config_file)
 
+
 def get_config_dir():
     """ gets the directory of the configuration """
     if os.getenv('AZURE_CONFIG_DIR'):
         return os.getenv('AZURE_CONFIG_DIR')
     else:
         return os.path.expanduser(os.path.join('~', '.azure-shell'))
+
+
 CONFIGURATION = Configuration()

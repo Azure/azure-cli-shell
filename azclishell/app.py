@@ -214,7 +214,7 @@ class Shell(object):
                 any_documentation = True
 
                 if word in self.completer.command_parameters[cmdstp] and \
-                self.completer.has_description(cmdstp + " " + word):
+                   self.completer.has_description(cmdstp + " " + word):
                     param_descrip = word + ":\n" + \
                         self.completer.get_param_description(
                             cmdstp + " " + word)
@@ -317,7 +317,7 @@ class Shell(object):
             print("An Integer should follow the colon")
             return ""
         if cmd in self.completer.command_examples and num >= 0 and\
-        num < len(self.completer.command_examples[cmd]):
+           num < len(self.completer.command_examples[cmd]):
             example = self.completer.command_examples[cmd][num][1]
             example = example.replace('\n', '')
 
@@ -371,7 +371,7 @@ class Shell(object):
                     if len(answer.split()) > 1:
                         start_index += 1
                         cmd += " " + answer.split()[-1] + " " +\
-                        u' '.join(text.split()[start_index:start_index + 1])
+                               u' '.join(text.split()[start_index:start_index + 1])
             example_cli.exit()
             del example_cli
         else:
@@ -469,8 +469,9 @@ class Shell(object):
                 set_scope("", add=False)
                 print('undefaulting all')
             elif len(value) == 1 and len(self.default_command.split()) > 0\
-                 and value[0] == self.default_command.split()[-1]:
+                    and value[0] == self.default_command.split()[-1]:
                 self.default_command = ' ' + ' '.join(self.default_command.split()[:-1])
+
                 if not self.default_command.strip():
                     self.default_command = self.default_command.strip()
                 set_scope(self.default_command, add=False)

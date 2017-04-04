@@ -25,6 +25,7 @@ EXAMPLE_REPL = False
 SHOW_DEFAULT = False
 SYMBOLS = False
 
+
 # pylint: disable=too-few-public-methods
 class _PromptFilter(Filter):
     def __call__(self, *a, **kw):
@@ -86,7 +87,7 @@ def config_settings(event):
     }
     for question in questions:
         while answer.lower() != 'y' and answer.lower() != 'n':
-            answer = prompt(u'\n%s (y/n): ' %question)
+            answer = prompt(u'\n%s (y/n): ' % question)
         config.set_val('Layout', questions[question], format_response(answer))
         answer = ""
 
