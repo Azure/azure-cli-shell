@@ -18,6 +18,7 @@ OUTPUT_CHOICES = ['json', 'tsv', 'table', 'jsonc']
 OUTPUT_OPTIONS = ['--output', '-o']
 GLOBAL_PARAM = OUTPUT_OPTIONS + ['--verbose', '--debug']
 
+
 def dynamic_param_logic(text):
     """ validates parameter values for dynamic completion """
     is_param = False
@@ -29,7 +30,7 @@ def dynamic_param_logic(text):
         if param.startswith("-"):
             is_param = True
         elif len(text.split()) > 2 and text.split()[-2]\
-        and text.split()[-2].startswith('-'):
+             and text.split()[-2].startswith('-'):
             is_param = True
             param = text.split()[-2]
             started_param = True
@@ -60,11 +61,11 @@ def gen_dyn_completion(comp, started_param, prefix, text):
     else:
         completion = comp
     if started_param:
-        if comp.lower().startswith(prefix.lower())\
-            and comp not in text.split():
+        if comp.lower().startswith(prefix.lower()) and comp not in text.split():
             yield Completion(completion, -len(prefix))
     else:
         yield Completion(completion, -len(prefix))
+
 
 # pylint: disable=too-many-instance-attributes
 class AzCompleter(Completer):
@@ -107,13 +108,12 @@ class AzCompleter(Completer):
 
     def validate_completion(self, param, words, text_before_cursor, double=True):
         """ validates that a param should be completed """
-        return  param.lower().startswith(words.lower()) and \
-                param.lower() != words.lower() and\
-                param not in text_before_cursor.split()\
-                and not text_before_cursor[-1].isspace() and\
-                (not (double and param in self.same_param_doubles)\
+        return param.lower().startswith(words.lower()) and \
+               param.lower() != words.lower() and\
+               param not in text_before_cursor.split()\
+               and not text_before_cursor[-1].isspace() and\
+               (not (double and param in self.same_param_doubles)
                 or self.same_param_doubles[param] not in text_before_cursor.split())
-
 
 
     def get_completions(self, document, complete_event):
@@ -143,12 +143,12 @@ class AzCompleter(Completer):
                     self.curr_command].arguments[arg_name].choices:
                 if started_param:
                     if choice.lower().startswith(prefix.lower())\
-                    and choice not in text.split():
+                       and choice not in text.split():
                         yield Completion(choice, -len(prefix))
                 else:
                     yield Completion(choice, -len(prefix))
 
-        except TypeError: # there is no choices option
+        except TypeError:  # there is no choices option
             pass
 
     def get_arg_name(self, is_param, param):
@@ -168,8 +168,8 @@ class AzCompleter(Completer):
             # dynamic param completion
             arg_name = self.get_arg_name(is_param, param)
 
-            if arg_name and (text.split()[-1].startswith('-') or\
-            text.split()[-2].startswith('-')):
+            if arg_name and (text.split()[-1].startswith('-') or
+                             text.split()[-2].startswith('-')):
                 self.gen_enum_completions(arg_name, text, started_param, prefix)
 
                 parse_args = self.argsfinder.get_parsed_args(
@@ -180,8 +180,9 @@ class AzCompleter(Completer):
                 if self.cmdtab[self.curr_command].arguments[arg_name].completer:
                     try:
                         for comp in self.cmdtab[self.curr_command].\
-                        arguments[arg_name].completer(prefix=prefix, action=None,\
-                        parser=None, parsed_args=parse_args):
+                        arguments[arg_name].completer(
+                                prefix=prefix, action=None,
+                                parser=None, parsed_args=parse_args):
 
                             for comp in gen_dyn_completion(
                                     comp, started_param, prefix, text):
@@ -205,7 +206,7 @@ class AzCompleter(Completer):
                                         yield comp
 
                             except TypeError:
-                                pass # other completion method used
+                                pass  # other completion method used
 
         except CLIError:  # if the user isn't logged in
             pass

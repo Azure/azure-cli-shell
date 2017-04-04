@@ -64,8 +64,8 @@ def space_examples(list_examples, rows):
     examples_with_index = []
 
     for i, _ in list(enumerate(list_examples)):
-        examples_with_index.append("[" + str(i + 1) + "] " + list_examples[i][0] +\
-        list_examples[i][1])
+        examples_with_index.append("[" + str(i + 1) + "] " + list_examples[i][0] +
+                                   list_examples[i][1])
 
     example = "".join(exam for exam in examples_with_index)
     num_newline = example.count('\n')
@@ -78,7 +78,7 @@ def space_examples(list_examples, rows):
 
         if get_section() * len_of_excerpt < num_newline:
             example = '\n'.join(group[begin:end]) + "\n"
-        else: # default chops top off
+        else:  # default chops top off
             example = '\n'.join(group[begin:]) + "\n"
             while ((get_section() - 1) * len_of_excerpt) > num_newline:
                 sub_section()
@@ -105,6 +105,7 @@ def _toolbar_info():
     ]
     return settings_items
 
+
 def space_toolbar(settings_items, cols, empty_space):
     """ formats the toolbar """
     counter = 0
@@ -116,6 +117,7 @@ def space_toolbar(settings_items, cols, empty_space):
 
     empty_space = empty_space[len(NOTIFICATIONS) + len(settings) + 1:]
     return settings, empty_space
+
 
 # pylint: disable=too-many-instance-attributes
 class Shell(object):
@@ -202,7 +204,7 @@ class Shell(object):
         rows = int(rows)
 
         for word in text.split():
-            if word.startswith("-"): # any parameter
+            if word.startswith("-"):  # any parameter
                 is_command = False
             if is_command:
                 command += str(word) + " "
@@ -214,8 +216,8 @@ class Shell(object):
                 if word in self.completer.command_parameters[cmdstp] and \
                 self.completer.has_description(cmdstp + " " + word):
                     param_descrip = word + ":\n" + \
-                    self.completer.get_param_description(cmdstp+ \
-                    " " + word)
+                        self.completer.get_param_description(
+                            cmdstp + " " + word)
 
                 self.description_docs = u'{}'.format(
                     self.completer.command_description[cmdstp])
@@ -287,8 +289,9 @@ class Shell(object):
         """ writes the prompt line """
         self.description_docs = u'{}'.format(prompt_command)
         self.cli.current_buffer.reset(
-            initial_document=Document(self.description_docs,\
-            cursor_position=position))
+            initial_document=Document(
+                self.description_docs,
+                cursor_position=position))
         self.cli.request_redraw()
 
     def handle_scoping(self, text):
@@ -520,7 +523,7 @@ class Shell(object):
             try:
                 document = self.cli.run(reset_current_buffer=True)
                 text = document.text
-                if not text: # not input
+                if not text:  # not input
                     self.set_prompt()
                     continue
                 cmd = text

@@ -15,6 +15,7 @@ import azclishell.configuration as config
 
 CMD_TABLE = APPLICATION.configuration.get_command_table()
 
+
 def install_modules():
     for cmd in CMD_TABLE:
         CMD_TABLE[cmd].load_arguments()
@@ -31,6 +32,7 @@ def install_modules():
         except Exception:  # pylint: disable=broad-except
             print("Error loading: {}".format(mod))
     _update_command_definitions(CMD_TABLE)
+
 
 def dump_command_table():
     """ dumps the command table """
@@ -95,7 +97,7 @@ def dump_command_table():
                     }
                 if "short-summary" in param:
                     data[cmd]['parameters'][param["name"].split()[0]]['help']\
-                     = param["short-summary"]
+                        = param["short-summary"]
         if "examples" in diction_help:
             examples = []
             for example in diction_help["examples"]:
