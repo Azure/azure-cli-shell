@@ -204,8 +204,8 @@ class AzCompleter(Completer):
                                             comp, started_param, prefix, text):
                                         yield comp
 
-                            except TypeError as ex:
-                                print("TypeError: " + ex.message)
+                            except TypeError:
+                                print("Other completion method used")
 
         except CLIError:  # if the user isn't logged in
             pass
