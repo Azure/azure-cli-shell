@@ -162,7 +162,7 @@ class AzCompleter(Completer):
     # pylint: disable=too-many-branches
     def gen_dynamic_completions(self, text):
         """ generates the dynamic values, like the names of resource groups """
-        try:
+        try:  # pylint: disable=too-many-nested-blocks
             is_param, started_param, prefix, param = dynamic_param_logic(text)
 
             # dynamic param completion
