@@ -55,6 +55,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     return_code_sum = run_pylint()
-    # code = run_pep8()
-    # return_code_sum += code
+    code = run_pep8()
+    return_code_sum += code
     sys.exit(return_code_sum)
