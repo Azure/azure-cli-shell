@@ -8,7 +8,7 @@
 from __future__ import print_function
 import sys
 
-from _common import get_files_without_header
+from license-check._common import get_files_without_header
 
 files_without_header = [file_path for file_path, file_contents in get_files_without_header()]
 

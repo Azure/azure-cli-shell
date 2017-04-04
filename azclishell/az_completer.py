@@ -113,11 +113,12 @@ class AzCompleter(Completer):
     def validate_completion(self, param, words, text_before_cursor, double=True):
         """ validates that a param should be completed """
         return param.lower().startswith(words.lower()) and \
-                param.lower() != words.lower() and\
-                    param not in text_before_cursor.split()\
-                        and not text_before_cursor[-1].isspace() and\
-                        (not (double and param in self.same_param_doubles)
-                         or self.same_param_doubles[param] not in text_before_cursor.split())
+                    param.lower() != words.lower() and\
+                        param not in text_before_cursor.split()\
+                            and not text_before_cursor[-1].isspace() and\
+                                (not (double and param in self.same_param_doubles) or\
+                                    self.same_param_doubles[param] not in\
+                                        text_before_cursor.split())
 
     def get_completions(self, document, complete_event):
         text = document.text_before_cursor
@@ -202,7 +203,7 @@ class AzCompleter(Completer):
                         except TypeError:
                             try:
                                 for comp in self.cmdtab[self.curr_command].\
-                                     arguments[arg_name].completer():
+                                        arguments[arg_name].completer():
 
                                     for comp in gen_dyn_completion(
                                             comp, started_param, prefix, text):
@@ -273,7 +274,7 @@ class AzCompleter(Completer):
                             display_meta=self.get_param_description(
                                 self.curr_command + " " + str(param)).replace('\n', ''))
 
-        if self.branch.children is not None and self._is_command: # all underneath commands
+        if self.branch.children is not None and self._is_command:  # all underneath commands
             for kid in self.branch.children:
                 if self.validate_completion(kid.data, text.split()[-1], text, False):
                     yield Completion(
@@ -320,4 +321,4 @@ class AzCompleter(Completer):
     def has_description(self, param):
         """ if a parameter has a description """
         return param in self.param_description.keys() and \
-        not self.param_description[param].isspace()
+               not self.param_description[param].isspace()

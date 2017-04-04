@@ -36,8 +36,8 @@ def add_random_new_lines(long_phrase, line_min=LINE_MINIMUM, tolerance=TOLERANCE
                 index += 1
                 skip = False
             while index < len(long_phrase) and \
-                  not long_phrase[index].isspace() and \
-                  index < tolerance + previous + line_min:
+                    not long_phrase[index].isspace() and \
+                    index < tolerance + previous + line_min:
                 index += 1
             if index < len(long_phrase):
                 if long_phrase[index].isspace():
@@ -47,8 +47,7 @@ def add_random_new_lines(long_phrase, line_min=LINE_MINIMUM, tolerance=TOLERANCE
 
     counter = 0
     for loc in nl_loc:
-        long_phrase = long_phrase[:loc + counter] +\
-        '\n' + long_phrase[loc + counter:]
+        long_phrase = long_phrase[:loc + counter] + '\n' + long_phrase[loc + counter:]
         counter += 1
     return long_phrase + "\n"
 
@@ -142,8 +141,8 @@ class GatherCommands(object):
 
                         self.param_descript[command + " " + par] =  \
                             add_random_new_lines(
-                                data[command]['parameters'][param]['required']
-                                + " " + data[command]['parameters'][param]['help'])
+                                data[command]['parameters'][param]['required'] +
+                                " " + data[command]['parameters'][param]['help'])
                         if par not in self.completable_param:
                             self.completable_param.append(par)
                         all_params.append(par)
