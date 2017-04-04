@@ -12,6 +12,8 @@ DEPENDENCIES = [
     'prompt_toolkit',
     'pylint',
     'pyyaml',
+    'autopep8',
+    'flake8',
     'six',
 ]
 
@@ -32,7 +34,7 @@ setup(
     author_email='azpycli@microsoft.com',
     scripts=['az-shell.bat', 'az-shell'],
     packages=[
-        "azclishell", "linter"
+        "azclishell", "linter", "license-check"
     ],
     url='https://github.com/oakeyc/azure-cli-interactive-shell',
     install_requires=DEPENDENCIES,

@@ -1,8 +1,13 @@
-""" highlighting and colors """
+# --------------------------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
+
 from azclishell.gather_commands import GatherCommands
 
 from pygments.lexer import RegexLexer, words
 from pygments.token import Name, Keyword, Operator, Text, Number
+
 
 class AzLexer(RegexLexer):
     """
@@ -16,18 +21,18 @@ class AzLexer(RegexLexer):
                 tuple(kid.data for kid in commands.command_tree.children),
                 prefix=r'\b',
                 suffix=r'\b'),
-             Keyword), # top level commands
+             Keyword),  # top level commands
             (words(
                 tuple(commands.get_all_subcommands()),
                 prefix=r'\b',
                 suffix=r'\b'),
-             Keyword.Declaration), # all other commands
+             Keyword.Declaration),  # all other commands
             (words(
                 tuple(param for param in commands.completable_param),
                 prefix=r'',
                 suffix=r'\b'),
-             Name.Class), # parameters
-            (r'.', Text), # all else
+             Name.Class),  # parameters
+            (r'.', Text),  # all else
             (r' .', Text),
         ]
     }

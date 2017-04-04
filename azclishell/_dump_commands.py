@@ -1,4 +1,8 @@
-""" dumps all the commands to cache """
+# --------------------------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
+
 from __future__ import print_function
 from importlib import import_module
 
@@ -14,6 +18,7 @@ from azure.cli.core.help_files import helps
 import azclishell.configuration as config
 
 CMD_TABLE = APPLICATION.configuration.get_command_table()
+
 
 def install_modules():
     for cmd in CMD_TABLE:
@@ -31,6 +36,7 @@ def install_modules():
         except Exception:  # pylint: disable=broad-except
             print("Error loading: {}".format(mod))
     _update_command_definitions(CMD_TABLE)
+
 
 def dump_command_table():
     """ dumps the command table """
@@ -95,7 +101,7 @@ def dump_command_table():
                     }
                 if "short-summary" in param:
                     data[cmd]['parameters'][param["name"].split()[0]]['help']\
-                     = param["short-summary"]
+                        = param["short-summary"]
         if "examples" in diction_help:
             examples = []
             for example in diction_help["examples"]:

@@ -1,4 +1,8 @@
-""" gets all the information from cached commands """
+# --------------------------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
+
 import math
 import os
 import json
@@ -24,7 +28,7 @@ def add_random_new_lines(long_phrase, line_min=LINE_MINIMUM, tolerance=TOLERANCE
     skip = False
     index = 0
     if len(long_phrase) > line_min:
-         # pylint: disable=unused-variable
+        # pylint: disable=unused-variable
         for num in range(int(math.floor(len(long_phrase) / line_min))):
             previous = index
             index += line_min
@@ -32,8 +36,8 @@ def add_random_new_lines(long_phrase, line_min=LINE_MINIMUM, tolerance=TOLERANCE
                 index += 1
                 skip = False
             while index < len(long_phrase) and \
-            not long_phrase[index].isspace() and \
-            index < tolerance + previous + line_min:
+                    not long_phrase[index].isspace() and \
+                    index < tolerance + previous + line_min:
                 index += 1
             if index < len(long_phrase):
                 if long_phrase[index].isspace():
@@ -43,10 +47,10 @@ def add_random_new_lines(long_phrase, line_min=LINE_MINIMUM, tolerance=TOLERANCE
 
     counter = 0
     for loc in nl_loc:
-        long_phrase = long_phrase[:loc + counter] +\
-        '\n' + long_phrase[loc + counter:]
+        long_phrase = long_phrase[:loc + counter] + '\n' + long_phrase[loc + counter:]
         counter += 1
     return long_phrase + "\n"
+
 
 # pylint: disable=too-many-instance-attributes
 class GatherCommands(object):
@@ -91,8 +95,7 @@ class GatherCommands(object):
         """ gathers from the files in a way that is convienent to use """
         command_file = CONFIGURATION.get_help_files()
         cache_path = os.path.join(azclishell.configuration.get_config_dir(), 'cache')
-        with open(os.path.join(cache_path, \
-        command_file), 'r') as help_file:
+        with open(os.path.join(cache_path, command_file), 'r') as help_file:
             data = json.load(help_file)
 
         self.add_exit()
@@ -125,7 +128,7 @@ class GatherCommands(object):
                 suppress = False
 
                 if data[command]['parameters'][param]['help'] and \
-                '==SUPPRESS==' in data[command]['parameters'][param]['help']:
+                   '==SUPPRESS==' in data[command]['parameters'][param]['help']:
                     suppress = True
                 if data[command]['parameters'][param]['help'] and not suppress:
                     param_double = None
@@ -137,8 +140,9 @@ class GatherCommands(object):
                             self.same_param_doubles[param_double] = par
 
                         self.param_descript[command + " " + par] =  \
-                        add_random_new_lines(data[command]['parameters'][param]['required']\
-                        + " " + data[command]['parameters'][param]['help'])
+                            add_random_new_lines(
+                                data[command]['parameters'][param]['required'] +
+                                " " + data[command]['parameters'][param]['help'])
                         if par not in self.completable_param:
                             self.completable_param.append(par)
                         all_params.append(par)

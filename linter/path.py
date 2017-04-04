@@ -12,7 +12,7 @@ COMMAND_MODULE_PREFIX = 'azure-cli-'
 def get_repo_root():
     """Returns the path to the source code root directory"""
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    while not os.path.exists(os.path.join(current_dir, 'CONTRIBUTING.rst')):
+    while not os.path.exists(os.path.join(current_dir, 'README.rst')):
         current_dir = os.path.dirname(current_dir)
 
     return current_dir

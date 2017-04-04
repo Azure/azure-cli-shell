@@ -26,15 +26,14 @@ def run_pylint():
     return return_code
 
 
-def run_pep8(modules):
-    print('\n\nRun flake8 for PEP8 compliance')
-    print('Modules: {}'.format(', '.join(name for name, _ in modules)))
+def run_pep8():
+    arguments = 'azclishell'
 
     command = 'flake8 --statistics --append-config={} {}'.format(
         os.path.join(automation_path.get_repo_root(), '.flake8'),
-        ' '.join(path for _, path in modules))
+        arguments)
 
-    return_code = call(command.split())
+    return_code = call((command).split())
     if return_code:
         print('Flake8 failed')
     else:
@@ -56,5 +55,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     return_code_sum = run_pylint()
-
+    code = run_pep8()
+    return_code_sum += code
     sys.exit(return_code_sum)

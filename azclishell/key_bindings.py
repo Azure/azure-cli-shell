@@ -1,4 +1,8 @@
-""" makes all the key bindings for the app """
+# --------------------------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
+
 from __future__ import print_function
 
 import azclishell.configuration
@@ -24,6 +28,7 @@ PROMPTING = False
 EXAMPLE_REPL = False
 SHOW_DEFAULT = False
 SYMBOLS = False
+
 
 # pylint: disable=too-few-public-methods
 class _PromptFilter(Filter):
@@ -86,7 +91,7 @@ def config_settings(event):
     }
     for question in questions:
         while answer.lower() != 'y' and answer.lower() != 'n':
-            answer = prompt(u'\n%s (y/n): ' %question)
+            answer = prompt(u'\n%s (y/n): ' % question)
         config.set_val('Layout', questions[question], format_response(answer))
         answer = ""
 

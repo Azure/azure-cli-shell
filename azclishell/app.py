@@ -1,4 +1,8 @@
-""" The Main Application """
+# --------------------------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
+
 from __future__ import unicode_literals, print_function
 
 import json
@@ -64,8 +68,8 @@ def space_examples(list_examples, rows):
     examples_with_index = []
 
     for i, _ in list(enumerate(list_examples)):
-        examples_with_index.append("[" + str(i + 1) + "] " + list_examples[i][0] +\
-        list_examples[i][1])
+        examples_with_index.append("[" + str(i + 1) + "] " + list_examples[i][0] +
+                                   list_examples[i][1])
 
     example = "".join(exam for exam in examples_with_index)
     num_newline = example.count('\n')
@@ -78,7 +82,7 @@ def space_examples(list_examples, rows):
 
         if get_section() * len_of_excerpt < num_newline:
             example = '\n'.join(group[begin:end]) + "\n"
-        else: # default chops top off
+        else:  # default chops top off
             example = '\n'.join(group[begin:]) + "\n"
             while ((get_section() - 1) * len_of_excerpt) > num_newline:
                 sub_section()
@@ -105,6 +109,7 @@ def _toolbar_info():
     ]
     return settings_items
 
+
 def space_toolbar(settings_items, cols, empty_space):
     """ formats the toolbar """
     counter = 0
@@ -116,6 +121,7 @@ def space_toolbar(settings_items, cols, empty_space):
 
     empty_space = empty_space[len(NOTIFICATIONS) + len(settings) + 1:]
     return settings, empty_space
+
 
 # pylint: disable=too-many-instance-attributes
 class Shell(object):
@@ -202,7 +208,7 @@ class Shell(object):
         rows = int(rows)
 
         for word in text.split():
-            if word.startswith("-"): # any parameter
+            if word.startswith("-"):  # any parameter
                 is_command = False
             if is_command:
                 command += str(word) + " "
@@ -212,10 +218,10 @@ class Shell(object):
                 any_documentation = True
 
                 if word in self.completer.command_parameters[cmdstp] and \
-                self.completer.has_description(cmdstp + " " + word):
+                   self.completer.has_description(cmdstp + " " + word):
                     param_descrip = word + ":\n" + \
-                    self.completer.get_param_description(cmdstp+ \
-                    " " + word)
+                        self.completer.get_param_description(
+                            cmdstp + " " + word)
 
                 self.description_docs = u'{}'.format(
                     self.completer.command_description[cmdstp])
@@ -287,8 +293,9 @@ class Shell(object):
         """ writes the prompt line """
         self.description_docs = u'{}'.format(prompt_command)
         self.cli.current_buffer.reset(
-            initial_document=Document(self.description_docs,\
-            cursor_position=position))
+            initial_document=Document(
+                self.description_docs,
+                cursor_position=position))
         self.cli.request_redraw()
 
     def handle_scoping(self, text):
@@ -314,7 +321,7 @@ class Shell(object):
             print("An Integer should follow the colon")
             return ""
         if cmd in self.completer.command_examples and num >= 0 and\
-        num < len(self.completer.command_examples[cmd]):
+           num < len(self.completer.command_examples[cmd]):
             example = self.completer.command_examples[cmd][num][1]
             example = example.replace('\n', '')
 
@@ -368,7 +375,7 @@ class Shell(object):
                     if len(answer.split()) > 1:
                         start_index += 1
                         cmd += " " + answer.split()[-1] + " " +\
-                        u' '.join(text.split()[start_index:start_index + 1])
+                               u' '.join(text.split()[start_index:start_index + 1])
             example_cli.exit()
             del example_cli
         else:
@@ -466,8 +473,9 @@ class Shell(object):
                 set_scope("", add=False)
                 print('undefaulting all')
             elif len(value) == 1 and len(self.default_command.split()) > 0\
-                 and value[0] == self.default_command.split()[-1]:
+                    and value[0] == self.default_command.split()[-1]:
                 self.default_command = ' ' + ' '.join(self.default_command.split()[:-1])
+
                 if not self.default_command.strip():
                     self.default_command = self.default_command.strip()
                 set_scope(self.default_command, add=False)
@@ -520,7 +528,7 @@ class Shell(object):
             try:
                 document = self.cli.run(reset_current_buffer=True)
                 text = document.text
-                if not text: # not input
+                if not text:  # not input
                     self.set_prompt()
                     continue
                 cmd = text

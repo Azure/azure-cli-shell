@@ -1,4 +1,8 @@
-""" a completer for the commands and parameters """
+# --------------------------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
+
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import azclishell.configuration
@@ -18,6 +22,7 @@ OUTPUT_CHOICES = ['json', 'tsv', 'table', 'jsonc']
 OUTPUT_OPTIONS = ['--output', '-o']
 GLOBAL_PARAM = OUTPUT_OPTIONS + ['--verbose', '--debug']
 
+
 def dynamic_param_logic(text):
     """ validates parameter values for dynamic completion """
     is_param = False
@@ -29,7 +34,7 @@ def dynamic_param_logic(text):
         if param.startswith("-"):
             is_param = True
         elif len(text.split()) > 2 and text.split()[-2]\
-        and text.split()[-2].startswith('-'):
+                and text.split()[-2].startswith('-'):
             is_param = True
             param = text.split()[-2]
             started_param = True
@@ -60,11 +65,11 @@ def gen_dyn_completion(comp, started_param, prefix, text):
     else:
         completion = comp
     if started_param:
-        if comp.lower().startswith(prefix.lower())\
-            and comp not in text.split():
+        if comp.lower().startswith(prefix.lower()) and comp not in text.split():
             yield Completion(completion, -len(prefix))
     else:
         yield Completion(completion, -len(prefix))
+
 
 # pylint: disable=too-many-instance-attributes
 class AzCompleter(Completer):
@@ -107,14 +112,11 @@ class AzCompleter(Completer):
 
     def validate_completion(self, param, words, text_before_cursor, double=True):
         """ validates that a param should be completed """
-        return  param.lower().startswith(words.lower()) and \
-                param.lower() != words.lower() and\
-                param not in text_before_cursor.split()\
-                and not text_before_cursor[-1].isspace() and\
-                (not (double and param in self.same_param_doubles)\
-                or self.same_param_doubles[param] not in text_before_cursor.split())
-
-
+        return param.lower().startswith(words.lower()) and param.lower() != words.lower() and\
+            param not in text_before_cursor.split() and not \
+            text_before_cursor[-1].isspace() and\
+            (not (double and param in self.same_param_doubles) or
+             self.same_param_doubles[param] not in text_before_cursor.split())
 
     def get_completions(self, document, complete_event):
         text = document.text_before_cursor
@@ -143,12 +145,12 @@ class AzCompleter(Completer):
                     self.curr_command].arguments[arg_name].choices:
                 if started_param:
                     if choice.lower().startswith(prefix.lower())\
-                    and choice not in text.split():
+                       and choice not in text.split():
                         yield Completion(choice, -len(prefix))
                 else:
                     yield Completion(choice, -len(prefix))
 
-        except TypeError: # there is no choices option
+        except TypeError:  # there is no choices option
             pass
 
     def get_arg_name(self, is_param, param):
@@ -168,8 +170,8 @@ class AzCompleter(Completer):
             # dynamic param completion
             arg_name = self.get_arg_name(is_param, param)
 
-            if arg_name and (text.split()[-1].startswith('-') or\
-            text.split()[-2].startswith('-')):
+            if arg_name and (text.split()[-1].startswith('-') or
+                             text.split()[-2].startswith('-')):
                 self.gen_enum_completions(arg_name, text, started_param, prefix)
 
                 parse_args = self.argsfinder.get_parsed_args(
@@ -179,9 +181,8 @@ class AzCompleter(Completer):
                 # this try catches which format it is
                 if self.cmdtab[self.curr_command].arguments[arg_name].completer:
                     try:
-                        for comp in self.cmdtab[self.curr_command].\
-                        arguments[arg_name].completer(prefix=prefix, action=None,\
-                        parser=None, parsed_args=parse_args):
+                        for comp in self.cmdtab[self.curr_command].arguments[arg_name].completer(
+                                prefix=prefix, action=None, parser=None, parsed_args=parse_args):
 
                             for comp in gen_dyn_completion(
                                     comp, started_param, prefix, text):
@@ -190,7 +191,7 @@ class AzCompleter(Completer):
                     except TypeError:
                         try:
                             for comp in self.cmdtab[self.curr_command].\
-                            arguments[arg_name].completer(prefix):
+                                    arguments[arg_name].completer(prefix):
 
                                 for comp in gen_dyn_completion(
                                         comp, started_param, prefix, text):
@@ -198,14 +199,14 @@ class AzCompleter(Completer):
                         except TypeError:
                             try:
                                 for comp in self.cmdtab[self.curr_command].\
-                                arguments[arg_name].completer():
+                                        arguments[arg_name].completer():
 
                                     for comp in gen_dyn_completion(
                                             comp, started_param, prefix, text):
                                         yield comp
 
                             except TypeError:
-                                pass # other completion method used
+                                pass  # other completion method used
 
         except CLIError:  # if the user isn't logged in
             pass
@@ -253,10 +254,11 @@ class AzCompleter(Completer):
             if self.has_parameters(self.curr_command):
                 for param in self.command_parameters[self.curr_command]:
                     if self.validate_completion(param, last_word, text) and\
-                    not param.startswith("--"):
-                        yield Completion(param, -len(last_word), display_meta=\
-                        self.get_param_description(
-                            self.curr_command + " " + str(param)).replace('\n', ''))
+                            not param.startswith("--"):
+                        yield Completion(
+                            param, -len(last_word),
+                            display_meta=self.get_param_description(
+                                self.curr_command + " " + str(param)).replace('\n', ''))
         elif last_word.startswith("--"):  # for regular parameters
             self._is_command = False
 
@@ -268,31 +270,31 @@ class AzCompleter(Completer):
                             display_meta=self.get_param_description(
                                 self.curr_command + " " + str(param)).replace('\n', ''))
 
-        if self.branch.children is not None and self._is_command: # all underneath commands
+        if self.branch.children is not None and self._is_command:  # all underneath commands
             for kid in self.branch.children:
                 if self.validate_completion(kid.data, text.split()[-1], text, False):
-                    yield Completion(str(kid.data),\
-                        -len(text.split()[-1]))
+                    yield Completion(
+                        str(kid.data), -len(text.split()[-1]))
 
     def gen_global_param_completions(self, text):
         """ Global parameter stuff hard-coded in """
         if text.split() and len(text.split()) > 0:
             for param in self.global_param:
                 if text.split()[-1].startswith('-') \
-                    and not text.split()[-1].startswith('--') and \
-                    param.startswith('-') and not param.startswith('--') and\
-                    self.validate_completion(param, text.split()[-1], text, double=False):
+                        and not text.split()[-1].startswith('--') and \
+                        param.startswith('-') and not param.startswith('--') and\
+                        self.validate_completion(param, text.split()[-1], text, double=False):
                     yield Completion(param, -len(text.split()[-1]))
 
                 elif text.split()[-1].startswith('--') and \
-                    self.validate_completion(param, text.split()[-1], text, double=False):
+                        self.validate_completion(param, text.split()[-1], text, double=False):
                     yield Completion(param, -len(text.split()[-1]))
 
             if text.split()[-1] in self.output_options:
                 for opt in self.output_choices:
                     yield Completion(opt)
             if len(text.split()) > 1 and\
-            text.split()[-2] in self.output_options:
+                    text.split()[-2] in self.output_options:
                 for opt in self.output_choices:
                     if self.validate_completion(opt, text.split()[-1], text, double=False):
                         yield Completion(opt, -len(text.split()[-1]))
@@ -315,4 +317,4 @@ class AzCompleter(Completer):
     def has_description(self, param):
         """ if a parameter has a description """
         return param in self.param_description.keys() and \
-        not self.param_description[param].isspace()
+            not self.param_description[param].isspace()

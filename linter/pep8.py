@@ -24,7 +24,6 @@ def fix_p2p8(directory):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print('usage: python automation.style.pep8 <directory>')
         sys.exit(1)
 
     fix_p2p8(sys.argv[1])

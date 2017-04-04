@@ -1,3 +1,8 @@
+# --------------------------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
+
 
 class CommandTree(object):
     """ a command tree """
@@ -80,6 +85,7 @@ def generate_tree(commands):
         else:
             node.add_child(prev)
     return node
+
 
 def in_tree(tree, cmd):
     """ if a command is in the tree """

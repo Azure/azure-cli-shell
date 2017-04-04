@@ -1,3 +1,7 @@
+# --------------------------------------------------------------------------------------------
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+# --------------------------------------------------------------------------------------------
 
 import azclishell.configuration
 from azclishell.key_bindings import get_show_default, get_symbols
@@ -5,7 +9,7 @@ from azclishell.key_bindings import get_show_default, get_symbols
 from prompt_toolkit.enums import DEFAULT_BUFFER, SEARCH_BUFFER
 from prompt_toolkit.filters import Filter, Always, IsDone, HasFocus, RendererHeightIsKnown
 from prompt_toolkit.layout.containers import VSplit, HSplit, \
-Window, FloatContainer, Float, ConditionalContainer
+    Window, FloatContainer, Float, ConditionalContainer
 from prompt_toolkit.layout.controls import BufferControl, FillControl, TokenListControl
 from prompt_toolkit.layout.dimension import LayoutDimension as D
 from prompt_toolkit.layout.lexers import PygmentsLexer, Lexer as PromptLex
@@ -23,11 +27,13 @@ from pygments.lexer import Lexer as PygLex
 MAX_COMPLETION = 16
 DEFAULT_COMMAND = ""
 
+
 # pylint: disable=too-few-public-methods
 class HasDefaultScope(Filter):
     """ if there is a scope on the input """
     def __call__(self, *a, **kw):
         return DEFAULT_COMMAND == ""
+
 
 # TODO fix this somehow
 input_processors = [
@@ -44,11 +50,13 @@ input_processors = [
         AppendAutoSuggestion(), HasFocus(DEFAULT_BUFFER) & HasDefaultScope()),
 ]
 
+
 # pylint: disable=too-few-public-methods
 class ShowDefault(Filter):
     """ toggle on and off seeing the default """
     def __call__(self, *a, **kw):
         return get_show_default()
+
 
 # pylint: disable=too-few-public-methods
 class ShowSymbol(Filter):
@@ -73,7 +81,7 @@ def set_scope(com, add=True):
 
 def get_prompt_tokens(cli):
     """ returns prompt tokens """
-    return [(Token.Az, 'az%s>> '%DEFAULT_COMMAND)]
+    return [(Token.Az, 'az%s>> ' % DEFAULT_COMMAND)]
 
 
 def get_height(cli):
@@ -116,17 +124,14 @@ def create_tutorial_layout(lex):
                     input_processors=input_processors,
                     lexer=lexer,
                     preview_search=Always()),
-                get_height=get_height,
-            ),
+                get_height=get_height),
             [
                 Float(xcursor=True,
                       ycursor=True,
                       content=CompletionsMenu(
                           max_height=MAX_COMPLETION,
                           scroll_offset=1,
-                          extra_filter=(HasFocus(DEFAULT_BUFFER))
-                          ))
-            ]),
+                          extra_filter=(HasFocus(DEFAULT_BUFFER))))]),
         ConditionalContainer(
             HSplit([
                 get_hline(),
@@ -215,10 +220,9 @@ def create_layout(lex, exam_lex, toolbar_lex):
                       content=CompletionsMenu(
                           max_height=MAX_COMPLETION,
                           scroll_offset=1,
-                          extra_filter=(HasFocus(DEFAULT_BUFFER))
-                          ))
-            ]),
-        layout_lower])
+                          extra_filter=(HasFocus(DEFAULT_BUFFER))))]),
+        layout_lower
+    ])
 
     return layout_full
 
@@ -226,7 +230,7 @@ def create_layout(lex, exam_lex, toolbar_lex):
 def get_anyhline(config):
     """ if there is a line between descriptions and example """
     if config.BOOLEAN_STATES[config.config.get('Layout', 'command_description')] or\
-    config.BOOLEAN_STATES[config.config.get('Layout', 'param_description')]:
+       config.BOOLEAN_STATES[config.config.get('Layout', 'param_description')]:
         return Window(
             width=D.exact(1),
             height=D.exact(1),
@@ -240,9 +244,7 @@ def get_descript(lexer):
     return Window(
         content=BufferControl(
             buffer_name="description",
-            lexer=lexer
-            ),
-        )
+            lexer=lexer))
 
 
 def get_param(lexer):
@@ -250,9 +252,7 @@ def get_param(lexer):
     return Window(
         content=BufferControl(
             buffer_name="parameter",
-            lexer=lexer
-            ),
-        )
+            lexer=lexer))
 
 
 def get_example(config, exam_lex):
@@ -261,9 +261,7 @@ def get_example(config, exam_lex):
         return Window(
             content=BufferControl(
                 buffer_name="examples",
-                lexer=exam_lex
-                ),
-            )
+                lexer=exam_lex))
     else:
         return get_empty()
 
