@@ -35,7 +35,7 @@ setup(
     author_email='azpycli@microsoft.com',
     scripts=['az-shell.bat', 'az-shell'],
     packages=[
-        "azclishell", "linter", "license-check"
+        "azclishell",
     ],
     url='https://github.com/azure/azure-cli-shell',
     install_requires=DEPENDENCIES,
