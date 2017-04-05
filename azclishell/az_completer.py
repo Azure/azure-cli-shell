@@ -179,7 +179,8 @@ class AzCompleter(Completer):
 
                 # there are 3 formats for completers the cli uses
                 # this try catches which format it is
-                if self.cmdtab[self.curr_command].arguments[arg_name].completer:
+                if self.cmdtab[self.curr_command].arguments[arg_name].completer and\
+                   text[-1].isspace():
                     try:
                         for comp in self.cmdtab[self.curr_command].arguments[arg_name].completer(
                                 prefix=prefix, action=None, parser=None, parsed_args=parse_args):

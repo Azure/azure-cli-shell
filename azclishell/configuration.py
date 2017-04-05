@@ -22,8 +22,8 @@ GESTURE_INFO = {
     SELECT_SYMBOL['query'] + "[path]" : "query previous command using jmespath syntax",
     "[cmd] " + SELECT_SYMBOL['example'] + " [num]" : "do a step by step tutorial of example",
     SELECT_SYMBOL['exit_code'] : "get the exit code of the previous command",
-    SELECT_SYMBOL['default'] : "default a scope",
-    SELECT_SYMBOL['undefault'] : "undefault a scope",
+    SELECT_SYMBOL['default'] + '[cmd]' : "set a scope",
+    SELECT_SYMBOL['undefault'] : "unset a scope",
     "Crtl+N" : "Scroll down the documentation",
     "Crtl+Y" : "Scroll up the documentation"
 }
