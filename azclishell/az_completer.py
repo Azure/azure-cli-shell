@@ -125,18 +125,19 @@ class AzCompleter(Completer):
         self._is_command = True
 
         text = reformat_cmd(text)
-
+        import collections
         if text.split():
-            for comp in self.gen_cmd_and_param_completions(text):
+            for comp in sorted(
+                    list(self.gen_cmd_and_param_completions(text)), key=lambda a: a.text):
                 yield comp
 
-        for cmd in self.gen_cmd_completions(text):
+        for cmd in sorted(list(self.gen_cmd_completions(text)), key=lambda a: a.text):
             yield cmd
 
-        for val in self.gen_dynamic_completions(text):
+        for val in sorted(list(self.gen_dynamic_completions(text)), key=lambda a: a.text,):
             yield val
 
-        for param in self.gen_global_param_completions(text):
+        for param in sorted(list(self.gen_global_param_completions(text)), key=lambda a: a.text,):
             yield param
 
     def gen_enum_completions(self, arg_name, text, started_param, prefix):
