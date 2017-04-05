@@ -310,7 +310,7 @@ class Shell(object):
             self.default_command += value
         return value
 
-    def handle_example(self, text):
+    def handle_example(self, text, continue_flag):
         """ parses for the tutorial """
         cmd = text.partition(SELECT_SYMBOL['example'])[0].rstrip()
         num = text.partition(SELECT_SYMBOL['example'])[2].strip()
@@ -341,9 +341,9 @@ class Shell(object):
                 flag_fill = False
             counter += 1
 
-        return self.example_repl(example_no_fill, example, starting_index)
+        return self.example_repl(example_no_fill, example, starting_index, continue_flag)
 
-    def example_repl(self, text, example, start_index):
+    def example_repl(self, text, example, start_index, continue_flag):
         """ REPL for interactive tutorials """
 
         if start_index:
@@ -381,7 +381,7 @@ class Shell(object):
         else:
             cmd = text
 
-        return cmd
+        return cmd, continue_flag
 
     # pylint: disable=too-many-branches
     def _special_cases(self, text, cmd, outside):
@@ -429,7 +429,7 @@ class Shell(object):
                 cmd = "az " + cmd
 
             elif SELECT_SYMBOL['example'] in text:
-                cmd = self.handle_example(cmd)
+                cmd = self.handle_example(cmd, continue_flag)
                 telemetry.track_ssg('tutorial', text)
 
         continue_flag, cmd = self.handle_scoping_input(continue_flag, cmd, text)
@@ -465,6 +465,7 @@ class Shell(object):
             print("defaulting: " + value)
             cmd = cmd.replace(SELECT_SYMBOL['default'], '')
             telemetry.track_ssg('default command', value)
+            continue_flag = True
 
         if SELECT_SYMBOL['undefault'] in text:
             value = text.partition(SELECT_SYMBOL['undefault'])[2].split()

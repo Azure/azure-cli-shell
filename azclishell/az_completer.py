@@ -231,8 +231,7 @@ class AzCompleter(Completer):
         for word in text.split():
             if word.startswith("-"):
                 self._is_command = False
-            else:
-
+            elif self._is_command:
                 temp_command += ' ' + str(word) if temp_command else str(word)
 
             if self.branch.has_child(word):
@@ -250,7 +249,6 @@ class AzCompleter(Completer):
         # this is for single char parameters
         if last_word.startswith("-") and not last_word.startswith("--"):
             self._is_command = False
-
             if self.has_parameters(self.curr_command):
                 for param in self.command_parameters[self.curr_command]:
                     if self.validate_completion(param, last_word, text) and\
