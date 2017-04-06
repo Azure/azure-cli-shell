@@ -7,6 +7,7 @@ from __future__ import print_function
 import os
 
 from azure.cli.core._config import az_config, set_global_config_value
+from azure.cli.core._help import PRIVACY_STATEMENT
 from prompt_toolkit import prompt
 from six.moves import configparser
 
@@ -92,12 +93,8 @@ class Configuration(object):
     def firsttime(self):
         """ sets it as already done"""
         self.config.set('DEFAULT', 'firsttime', 'no')
-        if az_config.getboolean('core', 'collect_telemetry'):
-            print('Microsoft would like to collect anonymous Azure CLI usage data to' +
-                  'improve our CLI.  Participation is voluntary and' +
-                  ' when you choose to participate,' + ' your device automatically' +
-                  ' sends information to Microsoft about how you use Azure CLI.' +
-                  'To update your choice, run "az configure" again.')
+        if az_config.getboolean('core', 'collect_telemetry', fallback=False):
+            print(PRIVACY_STATEMENT)
         else:
             set_global_config_value('core', 'collect_telemetry', ask_user_for_telemetry())
 
