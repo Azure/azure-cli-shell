@@ -10,6 +10,7 @@ from applicationinsights import TelemetryClient
 from applicationinsights.exceptions import enable
 
 from azclishell import __version__
+from azclishell.util import timeout
 
 from azure.cli.core._profile import Profile
 
@@ -47,7 +48,8 @@ class Telemetry(TelemetryClient):
         self.end_time = str(datetime.datetime.now())
         self.track_event('Run', {'start time' : self.start_time,
                                  'end time' : self.end_time})
-        self.flush()
+
+        timeout(self.flush())
 
 
 TC = Telemetry(INSTRUMENTATION_KEY)
