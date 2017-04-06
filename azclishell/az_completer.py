@@ -18,9 +18,20 @@ from prompt_toolkit.completion import Completer, Completion
 
 
 SELECT_SYMBOL = azclishell.configuration.SELECT_SYMBOL
+
+# GLOBAL_OUTPUT_OPTIONS_DESCRIPTIONS = {
+#     '--output' : 'Output format',
+#     '-o' : 'Output format'
+# }
+GLOBAL_PARAM_DESCRIPTIONS = {
+    '--verbose' : 'Increase logging verbosity. Use --debug for full debug logs.',
+    '--debug' : 'Increase logging verbosity to show all debug logs.',
+    '--output' : 'Output format',
+    '-o' : 'Output format'
+}
 OUTPUT_CHOICES = ['json', 'tsv', 'table', 'jsonc']
 OUTPUT_OPTIONS = ['--output', '-o']
-GLOBAL_PARAM = OUTPUT_OPTIONS + ['--verbose', '--debug']
+GLOBAL_PARAM = GLOBAL_PARAM_DESCRIPTIONS.keys()
 
 
 def dynamic_param_logic(text):
@@ -100,6 +111,7 @@ class AzCompleter(Completer):
         self.global_param = GLOBAL_PARAM if global_params else []
         self.output_choices = OUTPUT_CHOICES if global_params else []
         self.output_options = OUTPUT_OPTIONS if global_params else []
+        self.global_param_descriptions = GLOBAL_PARAM_DESCRIPTIONS if global_params else []
 
         self.global_parser = AzCliCommandParser(add_help=False)
         self.global_parser.add_argument_group('global', 'Global Arguments')
@@ -284,15 +296,20 @@ class AzCompleter(Completer):
                         and not text.split()[-1].startswith('--') and \
                         param.startswith('-') and not param.startswith('--') and\
                         self.validate_completion(param, text.split()[-1], text, double=False):
-                    yield Completion(param, -len(text.split()[-1]))
+                    yield Completion(
+                        param, -len(text.split()[-1]),
+                        display_meta=GLOBAL_PARAM_DESCRIPTIONS[param])
 
                 elif text.split()[-1].startswith('--') and \
                         self.validate_completion(param, text.split()[-1], text, double=False):
-                    yield Completion(param, -len(text.split()[-1]))
+                    yield Completion(
+                        param, -len(text.split()[-1]),
+                        display_meta=GLOBAL_PARAM_DESCRIPTIONS[param])
 
             if text.split()[-1] in self.output_options:
                 for opt in self.output_choices:
                     yield Completion(opt)
+
             if len(text.split()) > 1 and\
                     text.split()[-2] in self.output_options:
                 for opt in self.output_choices:
