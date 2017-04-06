@@ -125,7 +125,6 @@ class AzCompleter(Completer):
         self._is_command = True
 
         text = reformat_cmd(text)
-        import collections
         if text.split():
             for comp in sorted(
                     list(self.gen_cmd_and_param_completions(text)), key=lambda a: a.text):
