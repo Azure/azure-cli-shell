@@ -118,11 +118,11 @@ def get_config_dir():
 def ask_user_for_telemetry():
     """ asks the user for if we can collect telemetry """
     answer = " "
-    while answer.lower() != 'y' and answer.lower() != 'n':
-        answer = prompt(u'\nDo you agree to sending telemetry (y/n)? Default answer is yes: ')
+    while answer.lower() != 'yes' and answer.lower() != 'no':
+        answer = prompt(u'\nDo you agree to sending telemetry (yes/no)? Default answer is yes: ')
 
         if answer == '':
-            answer = 'y'
+            answer = 'yes'
 
     return answer
 
