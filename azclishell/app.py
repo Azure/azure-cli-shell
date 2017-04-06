@@ -104,7 +104,7 @@ def _toolbar_info():
         " [F1]Layout",
         "[F2]Defaults",
         "[F3]Keys",
-        "[Crtl+Q]Quit",
+        "[Crtl+D]Quit",
         tool_val
     ]
     return settings_items
@@ -534,7 +534,7 @@ class Shell(object):
                         continue
                     cmd = text
                     outside = False
-                except AttributeError:  # when the user pressed Control Q
+                except AttributeError:  # when the user pressed Control D
                     break
                 else:
                     b_flag, c_flag, outside, cmd = self._special_cases(text, cmd, outside)

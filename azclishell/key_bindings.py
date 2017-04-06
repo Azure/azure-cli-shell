@@ -42,10 +42,10 @@ class _ExampleFilter(Filter):
         return not EXAMPLE_REPL
 
 
-@registry.add_binding(Keys.ControlQ, eager=True)
+@registry.add_binding(Keys.ControlD, eager=True)
 def exit_(event):
-    """ exits the program when Control Q is pressed """
-    telemetry.track_key('ControlQ')
+    """ exits the program when Control D is pressed """
+    telemetry.track_key('ControlD')
     event.cli.set_return_value(None)
 
 
