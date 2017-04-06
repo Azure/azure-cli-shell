@@ -12,6 +12,7 @@ from applicationinsights.exceptions import enable
 from azclishell import __version__
 
 from azure.cli.core._profile import Profile
+from azure.cli.core.telemetry import _user_agrees_to_telemetry
 
 INSTRUMENTATION_KEY = '762871d5-45a2-4d67-bf47-e396caf53d9d'
 
@@ -38,10 +39,12 @@ class Telemetry(TelemetryClient):
         """ tracks the special key bindings """
         self.track_event('Key Press', {"key": key})
 
+    @_user_agrees_to_telemetry
     def start(self):
         """ starts recording stuff """
         self.start_time = str(datetime.datetime.now())
 
+    @_user_agrees_to_telemetry
     def conclude(self):
         """ concludings recording stuff """
         self.end_time = str(datetime.datetime.now())

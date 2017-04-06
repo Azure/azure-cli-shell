@@ -2,10 +2,12 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
-
+from __future__ import print_function
 
 import os
 
+from azure.cli.core._config import set_global_config_value
+from prompt_toolkit import prompt
 from six.moves import configparser
 
 SELECT_SYMBOL = {
@@ -90,6 +92,9 @@ class Configuration(object):
     def firsttime(self):
         """ sets it as already done"""
         self.config.set('DEFAULT', 'firsttime', 'no')
+        answer = ask_user_for_telemetry()
+        set_global_config_value('core', 'collect_telemetry', answer)
+
         self.update()
 
     def set_val(self, direct, section, val):
@@ -109,6 +114,19 @@ def get_config_dir():
         return os.getenv('AZURE_CONFIG_DIR')
     else:
         return os.path.expanduser(os.path.join('~', '.azure-shell'))
+
+
+def ask_user_for_telemetry():
+    """ asks the user for if we can collect telemetry """
+    answer = None
+    print('Do you agree to sending telemetry (y/n)? Default answer is yes')
+    while answer.lower() != 'y' and answer.lower() != 'n':
+        answer = prompt(u'\nInvalid input, please enter (y/n): ')
+
+        if answer == '':
+            answer = 'y'
+
+    return answer
 
 
 CONFIGURATION = Configuration()
