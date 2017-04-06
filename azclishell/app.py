@@ -146,7 +146,7 @@ class Shell(object):
         self.description_docs = u''
         self.param_docs = u''
         self.example_docs = u''
-        self._env = os.environ.copy()
+        self._env = os.environ
         self.last = None
         self.last_exit = 0
         self.input = input_custom
@@ -561,7 +561,7 @@ class Shell(object):
 
                 self.set_prompt()
                 if outside:
-                    subprocess.Popen(cmd, shell=True).communicate()
+                    subprocess.Popen(cmd, shell=True, env=self._env).communicate()
                 else:
                     self.cli_execute(cmd)
 
