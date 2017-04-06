@@ -92,8 +92,7 @@ class Configuration(object):
     def firsttime(self):
         """ sets it as already done"""
         self.config.set('DEFAULT', 'firsttime', 'no')
-        answer = ask_user_for_telemetry()
-        set_global_config_value('core', 'collect_telemetry', answer)
+        set_global_config_value('core', 'collect_telemetry', ask_user_for_telemetry())
 
         self.update()
 
@@ -118,10 +117,9 @@ def get_config_dir():
 
 def ask_user_for_telemetry():
     """ asks the user for if we can collect telemetry """
-    answer = None
-    print('Do you agree to sending telemetry (y/n)? Default answer is yes')
+    answer = " "
     while answer.lower() != 'y' and answer.lower() != 'n':
-        answer = prompt(u'\nInvalid input, please enter (y/n): ')
+        answer = prompt(u'\nDo you agree to sending telemetry (y/n)? Default answer is yes: ')
 
         if answer == '':
             answer = 'y'
