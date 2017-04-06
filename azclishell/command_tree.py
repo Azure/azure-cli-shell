@@ -89,7 +89,7 @@ def generate_tree(commands):
 
 def in_tree(tree, cmd):
     """ if a command is in the tree """
-    data = cmd.split()
+    data = cmd.split(' ')
     if not data:
         return True
     try:

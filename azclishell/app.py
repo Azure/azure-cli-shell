@@ -299,11 +299,9 @@ class Shell(object):
                 cursor_position=position))
         self.cli.request_redraw()
 
-    def handle_scoping(self, text):
+    def handle_scoping(self, value):
         """ narrows the scopes the commands """
-        if not text:
-            return ''
-        value = text[0]
+
         set_scope(value)
         if self.default_command:
             self.default_command += ' ' + value
@@ -461,14 +459,18 @@ class Shell(object):
 
     def handle_scoping_input(self, continue_flag, cmd, text):
         if SELECT_SYMBOL['default'] in text:
-            default = text.partition(SELECT_SYMBOL['default'])[2].split()
+            default = text.partition(SELECT_SYMBOL['default'])[2]
             if not text:
                 value = ''
             else:
                 value = default
-            # for kid in self.completer.branch.children:
-            #     print(kid.data)
-            if in_tree(self.completer.command_tree, value):
+
+            if self.default_command:
+                tree_val = self.default_command + " " + value
+            else:
+                tree_val = value
+
+            if in_tree(self.completer.command_tree, tree_val):
                 self.handle_scoping(value)
                 print("defaulting: " + value)
                 cmd = cmd.replace(SELECT_SYMBOL['default'], '')
