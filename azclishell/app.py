@@ -526,31 +526,34 @@ class Shell(object):
 
         while True:
             try:
-                document = self.cli.run(reset_current_buffer=True)
-                text = document.text
-                if not text:  # not input
-                    self.set_prompt()
-                    continue
-                cmd = text
-                outside = False
-            except AttributeError:  # when the user pressed Control Q
-                break
-            else:
-                b_flag, c_flag, outside, cmd = self._special_cases(text, cmd, outside)
-                if b_flag:
+                try:
+                    document = self.cli.run(reset_current_buffer=True)
+                    text = document.text
+                    if not text:  # not input
+                        self.set_prompt()
+                        continue
+                    cmd = text
+                    outside = False
+                except AttributeError:  # when the user pressed Control Q
                     break
-                if c_flag:
-                    self.set_prompt()
-                    continue
-
-                if not self.default_command:
-                    self.history.append(text)
-
-                self.set_prompt()
-                if outside:
-                    subprocess.Popen(cmd, shell=True).communicate()
                 else:
-                    self.cli_execute(cmd)
+                    b_flag, c_flag, outside, cmd = self._special_cases(text, cmd, outside)
+                    if b_flag:
+                        break
+                    if c_flag:
+                        self.set_prompt()
+                        continue
+
+                    if not self.default_command:
+                        self.history.append(text)
+
+                    self.set_prompt()
+                    if outside:
+                        subprocess.Popen(cmd, shell=True).communicate()
+                    else:
+                        self.cli_execute(cmd)
+            except KeyboardInterrupt:  # CTRL C
+                continue
 
         print('Have a lovely day!!')
         telemetry.conclude()
