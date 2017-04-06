@@ -15,6 +15,7 @@ import jmespath
 
 import azclishell.configuration
 from azclishell.az_lexer import AzLexer, ExampleLexer, ToolbarLexer
+from azclishell.command_tree import in_tree
 from azclishell.gather_commands import add_random_new_lines
 from azclishell.key_bindings import registry, get_section, sub_section
 from azclishell.layout import create_layout, create_tutorial_layout, set_scope
@@ -461,10 +462,19 @@ class Shell(object):
     def handle_scoping_input(self, continue_flag, cmd, text):
         if SELECT_SYMBOL['default'] in text:
             default = text.partition(SELECT_SYMBOL['default'])[2].split()
-            value = self.handle_scoping(default)
-            print("defaulting: " + value)
-            cmd = cmd.replace(SELECT_SYMBOL['default'], '')
-            telemetry.track_ssg('default command', value)
+            if not text:
+                value = ''
+            else:
+                value = default
+            # for kid in self.completer.branch.children:
+            #     print(kid.data)
+            if in_tree(self.completer.command_tree, value):
+                self.handle_scoping(value)
+                print("defaulting: " + value)
+                cmd = cmd.replace(SELECT_SYMBOL['default'], '')
+                telemetry.track_ssg('default command', value)
+            else:
+                print("not a valid value")
             continue_flag = True
 
         if SELECT_SYMBOL['undefault'] in text:
