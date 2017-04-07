@@ -120,13 +120,13 @@ class CompletionTest(unittest.TestCase):
 
         doc = Document(u'')
         gen = self.completer.get_completions(doc, None)
-        self.assertEqual(six.next(gen), Completion("create"))
         self.assertEqual(six.next(gen), Completion("command"))
+        self.assertEqual(six.next(gen), Completion("create"))
 
         doc = Document(u'c')
         gen = self.completer.get_completions(doc, None)
-        self.assertEqual(six.next(gen), Completion("create", -1))
         self.assertEqual(six.next(gen), Completion("command", -1))
+        self.assertEqual(six.next(gen), Completion("create", -1))
 
         doc = Document(u'cr')
         gen = self.completer.get_completions(doc, None)
