@@ -19,10 +19,11 @@ DEPENDENCIES = [
 
 with open('README.rst', 'r', encoding='utf-8') as f:
     README = f.read()
+
 with open('HISTORY.rst', 'r', encoding='utf-8') as f:
     HISTORY = f.read()
 
-__version__ = '0.1.1a29'
+__version__ = '0.1.1a31'
 
 setup(
     name='azure-cli-shell',
@@ -34,8 +35,8 @@ setup(
     author_email='azpycli@microsoft.com',
     scripts=['az-shell.bat', 'az-shell'],
     packages=[
-        "azclishell", "linter", "license-check"
+        "azclishell",
     ],
-    url='https://github.com/oakeyc/azure-cli-interactive-shell',
+    url='https://github.com/azure/azure-cli-shell',
     install_requires=DEPENDENCIES,
 )
