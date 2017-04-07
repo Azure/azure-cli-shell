@@ -557,6 +557,5 @@ class Shell(object):
             except KeyboardInterrupt:  # CTRL C
                 continue
 
-
         print('Have a lovely day!!')
         telemetry.conclude()
