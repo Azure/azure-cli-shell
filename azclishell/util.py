@@ -6,10 +6,7 @@
 
 import os
 import sys
-import signal
 import platform
-
-from functools import wraps
 
 from prompt_toolkit.styles import style_from_dict
 from pygments.token import Token
