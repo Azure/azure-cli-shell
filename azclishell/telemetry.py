@@ -5,6 +5,7 @@
 
 
 import datetime
+import threading
 
 from applicationinsights import TelemetryClient
 from applicationinsights.exceptions import enable
@@ -49,7 +50,18 @@ class Telemetry(TelemetryClient):
         self.track_event('Run', {'start time' : self.start_time,
                                  'end time' : self.end_time})
 
-        timeout(self.flush())
+        thread1 = TelThread(self.flush)
+        thread1.start()
+
+
+class TelThread(threading.Thread):
+    """ telemetry thread for exiting """
+    def __init__(self, threadfunc):
+        threading.Thread.__init__(self)
+        self.threadfunc = threadfunc
+
+    def run(self):
+        self.threadfunc()
 
 
 TC = Telemetry(INSTRUMENTATION_KEY)
