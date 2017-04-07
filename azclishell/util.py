@@ -123,30 +123,3 @@ def parse_quotes(cmd, quotes=True):
     else:
         args = words.split()
     return args
-
-
-class TimeoutError(Exception):
-    """ time out exception """
-    pass
-
-
-def timeout(seconds=2):
-    """ times out of something if it takes too long"""
-
-    def decorator(func):
-        def _handle_timeout(signum, frame):
-            raise TimeoutError()
-
-        @wraps(func)
-        def _wrapper(*arg, **kwargs):
-            signal.signal(signal.SIGALRM, _handle_timeout)
-            signal.alarm(seconds)
-            try:
-                result = func(*arg, **kwargs)
-            finally:
-                signal.alarm(0)
-            return result
-
-        return _wrapper
-
-    return decorator
