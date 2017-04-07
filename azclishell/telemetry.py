@@ -11,7 +11,6 @@ from applicationinsights import TelemetryClient
 from applicationinsights.exceptions import enable
 
 from azclishell import __version__
-from azclishell.util import timeout
 
 from azure.cli.core._profile import Profile
 
