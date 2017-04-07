@@ -299,7 +299,7 @@ class Shell(object):
                 cursor_position=position))
         self.cli.request_redraw()
 
-    def handle_scoping(self, value):
+    def set_scope(self, value):
         """ narrows the scopes the commands """
 
         set_scope(value)
@@ -471,12 +471,12 @@ class Shell(object):
                 tree_val = value
 
             if in_tree(self.completer.command_tree, tree_val):
-                self.handle_scoping(value)
+                self.set_scope(value)
                 print("defaulting: " + value)
                 cmd = cmd.replace(SELECT_SYMBOL['default'], '')
-                telemetry.track_ssg('default command', value)
+                telemetry.track_ssg('scope command', value)
             else:
-                print("not a valid value")
+                print("Scope must be a valid command")
             continue_flag = True
 
         if SELECT_SYMBOL['undefault'] in text:
