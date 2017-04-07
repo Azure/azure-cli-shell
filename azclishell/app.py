@@ -310,7 +310,7 @@ class Shell(object):
             self.default_command += value
         return value
 
-    def handle_example(self, text):
+    def handle_example(self, text, continue_flag):
         """ parses for the tutorial """
         cmd = text.partition(SELECT_SYMBOL['example'])[0].rstrip()
         num = text.partition(SELECT_SYMBOL['example'])[2].strip()
@@ -341,9 +341,9 @@ class Shell(object):
                 flag_fill = False
             counter += 1
 
-        return self.example_repl(example_no_fill, example, starting_index)
+        return self.example_repl(example_no_fill, example, starting_index, continue_flag)
 
-    def example_repl(self, text, example, start_index):
+    def example_repl(self, text, example, start_index, continue_flag):
         """ REPL for interactive tutorials """
 
         if start_index:
@@ -381,7 +381,7 @@ class Shell(object):
         else:
             cmd = text
 
-        return cmd
+        return cmd, continue_flag
 
     # pylint: disable=too-many-branches
     def _special_cases(self, text, cmd, outside):
@@ -429,7 +429,7 @@ class Shell(object):
                 cmd = "az " + cmd
 
             elif SELECT_SYMBOL['example'] in text:
-                cmd = self.handle_example(cmd)
+                cmd = self.handle_example(cmd, continue_flag)
                 telemetry.track_ssg('tutorial', text)
 
         continue_flag, cmd = self.handle_scoping_input(continue_flag, cmd, text)
@@ -459,19 +459,20 @@ class Shell(object):
         return continue_flag
 
     def handle_scoping_input(self, continue_flag, cmd, text):
-        if SELECT_SYMBOL['default'] in text:
-            default = text.partition(SELECT_SYMBOL['default'])[2].split()
+        if SELECT_SYMBOL['scope'] in text:
+            default = text.partition(SELECT_SYMBOL['scope'])[2].split()
             value = self.handle_scoping(default)
-            print("defaulting: " + value)
-            cmd = cmd.replace(SELECT_SYMBOL['default'], '')
-            telemetry.track_ssg('default command', value)
+            print("scoping: " + value)
+            cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
+            telemetry.track_ssg('scope command', value)
+            continue_flag = True
 
-        if SELECT_SYMBOL['undefault'] in text:
-            value = text.partition(SELECT_SYMBOL['undefault'])[2].split()
+        if SELECT_SYMBOL['unscope'] in text:
+            value = text.partition(SELECT_SYMBOL['unscope'])[2].split()
             if len(value) == 0:
                 self.default_command = ""
                 set_scope("", add=False)
-                print('undefaulting all')
+                print('unscoping all')
             elif len(value) == 1 and len(self.default_command.split()) > 0\
                     and value[0] == self.default_command.split()[-1]:
                 self.default_command = ' ' + ' '.join(self.default_command.split()[:-1])
@@ -479,8 +480,8 @@ class Shell(object):
                 if not self.default_command.strip():
                     self.default_command = self.default_command.strip()
                 set_scope(self.default_command, add=False)
-                print('undefaulting: ' + value[0])
-            cmd = cmd.replace(SELECT_SYMBOL['undefault'], '')
+                print('unscoping: ' + value[0])
+            cmd = cmd.replace(SELECT_SYMBOL['unscope'], '')
             continue_flag = True
         return continue_flag, cmd
 
@@ -535,6 +536,7 @@ class Shell(object):
                     cmd = text
                     outside = False
                 except AttributeError:  # when the user pressed Control D
+
                     break
                 else:
                     b_flag, c_flag, outside, cmd = self._special_cases(text, cmd, outside)
@@ -554,6 +556,7 @@ class Shell(object):
                         self.cli_execute(cmd)
             except KeyboardInterrupt:  # CTRL C
                 continue
+
 
         print('Have a lovely day!!')
         telemetry.conclude()

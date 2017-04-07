@@ -2,10 +2,13 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
-
+from __future__ import print_function
 
 import os
 
+from azure.cli.core._config import az_config, set_global_config_value
+from azure.cli.core._help import PRIVACY_STATEMENT
+from prompt_toolkit import prompt
 from six.moves import configparser
 
 SELECT_SYMBOL = {
@@ -13,8 +16,8 @@ SELECT_SYMBOL = {
     'query' : '?',
     'example' : '::',
     'exit_code' : '$',
-    'default' : '%%',
-    'undefault' : '^^'
+    'scope' : '%%',
+    'unscope' : '^^'
 }
 
 GESTURE_INFO = {
@@ -22,8 +25,8 @@ GESTURE_INFO = {
     SELECT_SYMBOL['query'] + "[path]" : "query previous command using jmespath syntax",
     "[cmd] " + SELECT_SYMBOL['example'] + " [num]" : "do a step by step tutorial of example",
     SELECT_SYMBOL['exit_code'] : "get the exit code of the previous command",
-    SELECT_SYMBOL['default'] : "default a scope",
-    SELECT_SYMBOL['undefault'] : "undefault a scope",
+    SELECT_SYMBOL['scope'] + '[cmd]' : "set a scope",
+    SELECT_SYMBOL['unscope'] : "unset a scope",
     "Crtl+N" : "Scroll down the documentation",
     "Crtl+Y" : "Scroll up the documentation"
 }
@@ -90,6 +93,11 @@ class Configuration(object):
     def firsttime(self):
         """ sets it as already done"""
         self.config.set('DEFAULT', 'firsttime', 'no')
+        if az_config.getboolean('core', 'collect_telemetry', fallback=False):
+            print(PRIVACY_STATEMENT)
+        else:
+            set_global_config_value('core', 'collect_telemetry', ask_user_for_telemetry())
+
         self.update()
 
     def set_val(self, direct, section, val):
@@ -109,6 +117,18 @@ def get_config_dir():
         return os.getenv('AZURE_CONFIG_DIR')
     else:
         return os.path.expanduser(os.path.join('~', '.azure-shell'))
+
+
+def ask_user_for_telemetry():
+    """ asks the user for if we can collect telemetry """
+    answer = " "
+    while answer.lower() != 'yes' and answer.lower() != 'no':
+        answer = prompt(u'\nDo you agree to sending telemetry (yes/no)? Default answer is yes: ')
+
+        if answer == '':
+            answer = 'yes'
+
+    return answer
 
 
 CONFIGURATION = Configuration()
