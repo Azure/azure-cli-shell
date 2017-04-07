@@ -458,8 +458,9 @@ class Shell(object):
         return continue_flag
 
     def handle_scoping_input(self, continue_flag, cmd, text):
-        if SELECT_SYMBOL['default'] in text:
-            default = text.partition(SELECT_SYMBOL['default'])[2]
+
+        if SELECT_SYMBOL['scope'] in text:
+            default = text.partition(SELECT_SYMBOL['scope'])[2]
             if not text:
                 value = ''
             else:
@@ -473,18 +474,19 @@ class Shell(object):
             if in_tree(self.completer.command_tree, tree_val):
                 self.set_scope(value)
                 print("defaulting: " + value)
-                cmd = cmd.replace(SELECT_SYMBOL['default'], '')
+                cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
                 telemetry.track_ssg('scope command', value)
             else:
                 print("Scope must be a valid command")
+
             continue_flag = True
 
-        if SELECT_SYMBOL['undefault'] in text:
-            value = text.partition(SELECT_SYMBOL['undefault'])[2].split()
+        if SELECT_SYMBOL['unscope'] in text:
+            value = text.partition(SELECT_SYMBOL['unscope'])[2].split()
             if len(value) == 0:
                 self.default_command = ""
                 set_scope("", add=False)
-                print('undefaulting all')
+                print('unscoping all')
             elif len(value) == 1 and len(self.default_command.split()) > 0\
                     and value[0] == self.default_command.split()[-1]:
                 self.default_command = ' ' + ' '.join(self.default_command.split()[:-1])
@@ -492,8 +494,8 @@ class Shell(object):
                 if not self.default_command.strip():
                     self.default_command = self.default_command.strip()
                 set_scope(self.default_command, add=False)
-                print('undefaulting: ' + value[0])
-            cmd = cmd.replace(SELECT_SYMBOL['undefault'], '')
+                print('unscoping: ' + value[0])
+            cmd = cmd.replace(SELECT_SYMBOL['unscope'], '')
             continue_flag = True
         return continue_flag, cmd
 
@@ -550,14 +552,14 @@ class Shell(object):
                 break
             else:
                 b_flag, c_flag, outside, cmd = self._special_cases(text, cmd, outside)
+
+                if not self.default_command:
+                    self.history.append(text)
                 if b_flag:
                     break
                 if c_flag:
                     self.set_prompt()
                     continue
-
-                if not self.default_command:
-                    self.history.append(text)
 
                 self.set_prompt()
                 if outside:
