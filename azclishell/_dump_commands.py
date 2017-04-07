@@ -114,7 +114,7 @@ def dump_command_table():
 
 class Exporter(json.JSONEncoder):
 
-    def default(self, o):#pylint: disable=method-hidden
+    def default(self, o):  # pylint: disable=method-hidden
         try:
             return super(Exporter, self).default(o)
         except TypeError:
