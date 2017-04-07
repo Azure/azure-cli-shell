@@ -459,20 +459,20 @@ class Shell(object):
         return continue_flag
 
     def handle_scoping_input(self, continue_flag, cmd, text):
-        if SELECT_SYMBOL['default'] in text:
-            default = text.partition(SELECT_SYMBOL['default'])[2].split()
+        if SELECT_SYMBOL['scope'] in text:
+            default = text.partition(SELECT_SYMBOL['scope'])[2].split()
             value = self.handle_scoping(default)
-            print("defaulting: " + value)
-            cmd = cmd.replace(SELECT_SYMBOL['default'], '')
-            telemetry.track_ssg('default command', value)
+            print("scoping: " + value)
+            cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
+            telemetry.track_ssg('scope command', value)
             continue_flag = True
 
-        if SELECT_SYMBOL['undefault'] in text:
-            value = text.partition(SELECT_SYMBOL['undefault'])[2].split()
+        if SELECT_SYMBOL['unscope'] in text:
+            value = text.partition(SELECT_SYMBOL['unscope'])[2].split()
             if len(value) == 0:
                 self.default_command = ""
                 set_scope("", add=False)
-                print('undefaulting all')
+                print('unscoping all')
             elif len(value) == 1 and len(self.default_command.split()) > 0\
                     and value[0] == self.default_command.split()[-1]:
                 self.default_command = ' ' + ' '.join(self.default_command.split()[:-1])
@@ -480,8 +480,8 @@ class Shell(object):
                 if not self.default_command.strip():
                     self.default_command = self.default_command.strip()
                 set_scope(self.default_command, add=False)
-                print('undefaulting: ' + value[0])
-            cmd = cmd.replace(SELECT_SYMBOL['undefault'], '')
+                print('unscoping: ' + value[0])
+            cmd = cmd.replace(SELECT_SYMBOL['unscope'], '')
             continue_flag = True
         return continue_flag, cmd
 

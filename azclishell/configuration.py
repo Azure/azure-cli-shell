@@ -13,8 +13,8 @@ SELECT_SYMBOL = {
     'query' : '?',
     'example' : '::',
     'exit_code' : '$',
-    'default' : '%%',
-    'undefault' : '^^'
+    'scope' : '%%',
+    'unscope' : '^^'
 }
 
 GESTURE_INFO = {
@@ -22,8 +22,8 @@ GESTURE_INFO = {
     SELECT_SYMBOL['query'] + "[path]" : "query previous command using jmespath syntax",
     "[cmd] " + SELECT_SYMBOL['example'] + " [num]" : "do a step by step tutorial of example",
     SELECT_SYMBOL['exit_code'] : "get the exit code of the previous command",
-    SELECT_SYMBOL['default'] + '[cmd]' : "set a scope",
-    SELECT_SYMBOL['undefault'] : "unset a scope",
+    SELECT_SYMBOL['scope'] + '[cmd]' : "set a scope",
+    SELECT_SYMBOL['unscope'] : "unset a scope",
     "Crtl+N" : "Scroll down the documentation",
     "Crtl+Y" : "Scroll up the documentation"
 }
