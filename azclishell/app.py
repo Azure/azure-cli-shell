@@ -386,9 +386,9 @@ class Shell(object):
     def _special_cases(self, text, cmd, outside):
         break_flag = False
         continue_flag = False
-        if 'az' in text:
+        if text and text.split()[0].lower() == 'az':
             telemetry.track_ssg('az', text)
-            cmd = cmd.replace('az', '')
+            cmd = ' '.join(text.split()[1:])
         if self.default_command:
             cmd = self.default_command + " " + cmd
 
