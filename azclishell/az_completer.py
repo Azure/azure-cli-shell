@@ -131,6 +131,7 @@ class AzCompleter(Completer):
 
         text = reformat_cmd(text)
         if text.split():
+
             for comp in sort_completions(self.gen_cmd_and_param_completions(text)):
                 yield comp
 

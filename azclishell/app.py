@@ -15,6 +15,7 @@ import jmespath
 
 import azclishell.configuration
 from azclishell.az_lexer import AzLexer, ExampleLexer, ToolbarLexer
+from azclishell.command_tree import in_tree
 from azclishell.gather_commands import add_random_new_lines
 from azclishell.key_bindings import registry, get_section, sub_section
 from azclishell.layout import create_layout, create_tutorial_layout, set_scope
@@ -145,7 +146,7 @@ class Shell(object):
         self.description_docs = u''
         self.param_docs = u''
         self.example_docs = u''
-        self._env = os.environ.copy()
+        self._env = os.environ
         self.last = None
         self.last_exit = 0
         self.input = input_custom
@@ -298,11 +299,9 @@ class Shell(object):
                 cursor_position=position))
         self.cli.request_redraw()
 
-    def handle_scoping(self, text):
+    def set_scope(self, value):
         """ narrows the scopes the commands """
-        if not text:
-            return ''
-        value = text[0]
+
         set_scope(value)
         if self.default_command:
             self.default_command += ' ' + value
@@ -459,12 +458,27 @@ class Shell(object):
         return continue_flag
 
     def handle_scoping_input(self, continue_flag, cmd, text):
+
         if SELECT_SYMBOL['scope'] in text:
-            default = text.partition(SELECT_SYMBOL['scope'])[2].split()
-            value = self.handle_scoping(default)
-            print("scoping: " + value)
-            cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
-            telemetry.track_ssg('scope command', value)
+            default = text.partition(SELECT_SYMBOL['scope'])[2]
+            if not text:
+                value = ''
+            else:
+                value = default
+
+            if self.default_command:
+                tree_val = self.default_command + " " + value
+            else:
+                tree_val = value
+
+            if in_tree(self.completer.command_tree, tree_val):
+                self.set_scope(value)
+                print("defaulting: " + value)
+                cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
+                telemetry.track_ssg('scope command', value)
+            else:
+                print("Scope must be a valid command")
+
             continue_flag = True
 
         if SELECT_SYMBOL['unscope'] in text:
@@ -549,7 +563,7 @@ class Shell(object):
 
                 self.set_prompt()
                 if outside:
-                    subprocess.Popen(cmd, shell=True).communicate()
+                    subprocess.Popen(cmd, shell=True, env=self._env).communicate()
                 else:
                     self.cli_execute(cmd)
 
