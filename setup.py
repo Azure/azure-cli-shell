@@ -25,6 +25,7 @@ with open('HISTORY.rst', 'r', encoding='utf-8') as f:
 
 __version__ = '0.1.1b2'
 
+
 setup(
     name='azure-cli-shell',
     version=__version__,
