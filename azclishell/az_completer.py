@@ -148,6 +148,7 @@ class AzCompleter(Completer):
             yield param
 
     def gen_enum_completions(self, arg_name, text, started_param, prefix):
+        """ generates dynamic enumeration completions """
         try:  # if enum completion
             for choice in self.cmdtab[
                     self.curr_command].arguments[arg_name].choices:
@@ -162,6 +163,7 @@ class AzCompleter(Completer):
             pass
 
     def get_arg_name(self, is_param, param):
+        """ gets the argument name used in the command table for a parameter """
         if self.curr_command in self.cmdtab and is_param:
             for arg in self.cmdtab[self.curr_command].arguments:
 
@@ -175,13 +177,14 @@ class AzCompleter(Completer):
         try:  # pylint: disable=too-many-nested-blocks
             is_param, started_param, prefix, param = dynamic_param_logic(text)
 
-            # dynamic param completion
+            # command table specific name
             arg_name = self.get_arg_name(is_param, param)
 
             if arg_name and (text.split()[-1].startswith('-') or
                              text.split()[-2].startswith('-')):
+                # enumeration completions
                 self.gen_enum_completions(arg_name, text, started_param, prefix)
-
+                # parse for certain values
                 parse_args = self.argsfinder.get_parsed_args(
                     parse_quotes(text, quotes=False))
 
@@ -237,14 +240,14 @@ class AzCompleter(Completer):
         """ generates command and parameter completions """
         temp_command = str('')
         txtspt = text.split()
-        for word in txtspts:
+        for word in txtspt:
             if word.startswith("-"):
                 self._is_command = False
             else:
-
+                # building what the command is
                 temp_command += ' ' + str(word) if temp_command else str(word)
 
-            if self.branch.has_child(word):
+            if self.branch.has_child(word):  # moving down command tree
                 self.branch = self.branch.get_child(word, self.branch.children)
 
         if len(text) > 0 and text[-1].isspace():
@@ -290,6 +293,7 @@ class AzCompleter(Completer):
         txtspt = text.split()
         if txtspt and len(txtspt) > 0:
             for param in self.global_param:
+                # for single dash global parameters
                 if txtspt[-1].startswith('-') \
                         and not txtspt[-1].startswith('--') and \
                         param.startswith('-') and not param.startswith('--') and\
@@ -297,17 +301,17 @@ class AzCompleter(Completer):
                     yield Completion(
                         param, -len(txtspt[-1]),
                         display_meta=GLOBAL_PARAM_DESCRIPTIONS[param])
-
+                # for double dash global parameters
                 elif txtspt[-1].startswith('--') and \
                         self.validate_completion(param, txtspt[-1], text, double=False):
                     yield Completion(
                         param, -len(txtspt[-1]),
                         display_meta=GLOBAL_PARAM_DESCRIPTIONS[param])
-
+            # if there is an output, gets the options without user typing
             if txtspt[-1] in self.output_options:
                 for opt in self.output_choices:
                     yield Completion(opt)
-
+            # if there is an output option, if they have started typing
             if len(txtspt) > 1 and\
                     txtspt[-2] in self.output_options:
                 for opt in self.output_choices:
