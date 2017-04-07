@@ -105,7 +105,7 @@ def _toolbar_info():
         " [F1]Layout",
         "[F2]Defaults",
         "[F3]Keys",
-        "[Crtl+Q]Quit",
+        "[Crtl+D]Quit",
         tool_val
     ]
     return settings_items
@@ -541,31 +541,34 @@ class Shell(object):
 
         while True:
             try:
-                document = self.cli.run(reset_current_buffer=True)
-                text = document.text
-                if not text:  # not input
-                    self.set_prompt()
-                    continue
-                cmd = text
-                outside = False
-            except AttributeError:  # when the user pressed Control Q
-                break
-            else:
-                b_flag, c_flag, outside, cmd = self._special_cases(text, cmd, outside)
-
-                if not self.default_command:
-                    self.history.append(text)
-                if b_flag:
+                try:
+                    document = self.cli.run(reset_current_buffer=True)
+                    text = document.text
+                    if not text:  # not input
+                        self.set_prompt()
+                        continue
+                    cmd = text
+                    outside = False
+                except AttributeError:  # when the user pressed Control D
                     break
-                if c_flag:
-                    self.set_prompt()
-                    continue
-
-                self.set_prompt()
-                if outside:
-                    subprocess.Popen(cmd, shell=True, env=self._env).communicate()
                 else:
-                    self.cli_execute(cmd)
+                    b_flag, c_flag, outside, cmd = self._special_cases(text, cmd, outside)
+                    if b_flag:
+                        break
+                    if c_flag:
+                        self.set_prompt()
+                        continue
+
+                    if not self.default_command:
+                        self.history.append(text)
+
+                    self.set_prompt()
+                    if outside:
+                        subprocess.Popen(cmd, shell=True).communicate()
+                    else:
+                        self.cli_execute(cmd)
+            except KeyboardInterrupt:  # CTRL C
+                continue
 
         print('Have a lovely day!!')
         telemetry.conclude()
