@@ -3,9 +3,6 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 
-import azclishell.configuration
-from azclishell.key_bindings import get_show_default, get_symbols
-
 from prompt_toolkit.enums import DEFAULT_BUFFER, SEARCH_BUFFER
 from prompt_toolkit.filters import Filter, Always, IsDone, HasFocus, RendererHeightIsKnown
 from prompt_toolkit.layout.containers import VSplit, HSplit, \
@@ -23,6 +20,8 @@ from prompt_toolkit.layout.screen import Char
 from pygments.token import Token
 from pygments.lexer import Lexer as PygLex
 
+import azclishell.configuration
+from azclishell.key_bindings import get_show_default, get_symbols
 
 MAX_COMPLETION = 16
 DEFAULT_COMMAND = ""

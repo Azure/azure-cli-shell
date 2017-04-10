@@ -12,6 +12,16 @@ import subprocess
 import sys
 
 import jmespath
+from six.moves import configparser
+
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.buffer import Buffer
+from prompt_toolkit.document import Document
+from prompt_toolkit.enums import DEFAULT_BUFFER
+from prompt_toolkit.filters import Always
+from prompt_toolkit.history import InMemoryHistory
+from prompt_toolkit.interface import CommandLineInterface, Application
+from prompt_toolkit.shortcuts import create_eventloop
 
 import azclishell.configuration
 from azclishell.az_lexer import AzLexer, ExampleLexer, ToolbarLexer
@@ -32,16 +42,6 @@ from azure.cli.core._session import ACCOUNT, CONFIG, SESSION
 from azure.cli.core._util import (show_version_info_exit, handle_exception)
 from azure.cli.core._util import CLIError
 
-from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-from prompt_toolkit.buffer import Buffer
-from prompt_toolkit.document import Document
-from prompt_toolkit.enums import DEFAULT_BUFFER
-from prompt_toolkit.filters import Always
-from prompt_toolkit.history import InMemoryHistory
-from prompt_toolkit.interface import CommandLineInterface, Application
-from prompt_toolkit.shortcuts import create_eventloop
-
-from six.moves import configparser
 
 SHELL_CONFIGURATION = azclishell.configuration.CONFIGURATION
 SHELL_CONFIG_DIR = azclishell.configuration.get_config_dir

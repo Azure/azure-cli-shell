@@ -3,10 +3,10 @@
 # Licensed under the MIT License. See License.txt in the project root for license information.
 # --------------------------------------------------------------------------------------------
 
-from azclishell.gather_commands import GatherCommands
-
 from pygments.lexer import RegexLexer, words
 from pygments.token import Name, Keyword, Operator, Text, Number
+
+from azclishell.gather_commands import GatherCommands
 
 
 class AzLexer(RegexLexer):
