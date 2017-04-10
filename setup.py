@@ -10,10 +10,7 @@ DEPENDENCIES = [
     'azure-cli',
     'jmespath',
     'prompt_toolkit',
-    'pylint',
     'pyyaml',
-    'autopep8',
-    'flake8',
     'six',
 ]
 
