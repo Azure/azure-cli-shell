@@ -11,6 +11,7 @@ DEPENDENCIES = [
     'jmespath',
     'prompt_toolkit',
     'pyyaml',
+    'pylint',
     'six',
 ]
 
