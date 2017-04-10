@@ -4,6 +4,33 @@ from prompt_toolkit.styles import style_from_dict
 from pygments.token import Token
 
 
+def color_mapping(curr_completion, completion, prompt, command, subcommand,
+                  param, text, line, example, toolbar):
+
+    return style_from_dict({
+        # Completion colors
+        Token.Menu.Completions.Completion.Current: curr_completion,
+        Token.Menu.Completions.Completion: completion,
+        Token.Menu.Completions.ProgressButton: 'bg:#b78991',
+        Token.Menu.Completions.ProgressBar: 'bg:#ffc0cb',
+
+        Token.Az: prompt,
+        Token.Prompt.Arg: prompt,
+
+        # Pretty Words
+        Token.Keyword: command,
+        Token.Keyword.Declaration: subcommand,
+        Token.Name.Class: param,
+        Token.Text: text,
+
+        Token.Line: line,
+        Token.Number: example,
+        # toolbar
+        Token.Operator: toolbar,
+        Token.Toolbar: toolbar
+    })
+
+
 def no_style_wrapper():
     """ wraps for a no colors function """
     return None
@@ -165,24 +192,25 @@ def pastel_style():
 
 
 def halloween_style():
+    """ halloween colors """
     return style_from_dict({
         # Completion colors
-        Token.Menu.Completions.Completion.Current: 'bg:#56BAEC #ffffff',
-        Token.Menu.Completions.Completion: 'bg:#B4D8E7 #ffffff',
+        Token.Menu.Completions.Completion.Current: 'bg:#7A3E48 #ffffff',
+        Token.Menu.Completions.Completion: 'bg:#3D3242 #ffffff',
         Token.Menu.Completions.ProgressButton: 'bg:#b78991',
         Token.Menu.Completions.ProgressBar: 'bg:#ffc0cb',
 
-        Token.Az: '#FFAEAE',
-        Token.Prompt.Arg: '#B0E57C',
+        Token.Az: '#3D3242',
+        Token.Prompt.Arg: '#3D3242',
 
         # Pretty Words
-        Token.Keyword: '#FFEC94',
-        Token.Keyword.Declaration: '#FFEC94',
-        Token.Name.Class: '#FFEC94',
-        Token.Text: '#B4D8E7',
+        Token.Keyword: '#7A3E48',
+        Token.Keyword.Declaration: '#7A3E48',
+        Token.Name.Class: '#B95835',
+        Token.Text: '#E18942',
 
-        Token.Line: '#FFF0AA',
-        Token.Number: '#FFF0AA',
+        Token.Line: '#EECD86',
+        Token.Number: '#EECD86',
         # toolbar
         Token.Operator: 'bg:#000000 #ffffff',
         Token.Toolbar: 'bg:#000000 #ffffff'
@@ -195,7 +223,8 @@ OPTIONS = {
     'default' : default_style,
     'none' : no_style_wrapper,
     'contrast' : high_contrast_style,
-    'pastel' : pastel_style
+    'pastel' : pastel_style,
+    'halloween' : halloween_style
 }
 
 
