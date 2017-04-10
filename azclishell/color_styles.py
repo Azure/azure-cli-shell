@@ -205,6 +205,23 @@ def primary_style():
     )
 
 
+def neon_style():
+    """ a blue green style """
+    return color_mapping(
+        'bg:#00ffff #ffffff',
+        'bg:#00ff00 #ffffff',
+        '#ff0000',
+        '#ff00ff',
+        '#FD0987',
+        '#7920FF',
+        '#FF3300',
+        '#0000ff',
+        '#ff00ff',
+        'bg:#FFFF33 #ff0000',
+    )
+
+
+
 OPTIONS = {
     'quiet' : quiet_style,
     'purple' : purple_style,
@@ -216,7 +233,8 @@ OPTIONS = {
     'grey' : grey_style,
     'br' : blue_red_style,
     'bg' : blue_green_style,
-    'primary' : primary_style
+    'primary' : primary_style,
+    'neon' : neon_style
 }
 
 
