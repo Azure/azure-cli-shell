@@ -145,7 +145,7 @@ class AzCompleter(Completer):
             yield param
 
     def gen_enum_completions(self, arg_name, text, started_param, prefix):
-        try:  # if enum completion
+        try:  # if enum completion)
             for choice in self.cmdtab[
                     self.curr_command].arguments[arg_name].choices:
                 if started_param:
@@ -175,20 +175,21 @@ class AzCompleter(Completer):
             # dynamic param completion
             arg_name = self.get_arg_name(is_param, param)
 
-            if arg_name and (text.split()[-1].startswith('-') or
+            if arg_name and ((text.split()[-1].startswith('-') and text[-1].isspace()) or
                              text.split()[-2].startswith('-')):
-                self.gen_enum_completions(arg_name, text, started_param, prefix)
+
+                for comp in self.gen_enum_completions(arg_name, text, started_param, prefix):
+                    yield comp
 
                 parse_args = self.argsfinder.get_parsed_args(
                     parse_quotes(text, quotes=False))
 
                 # there are 3 formats for completers the cli uses
                 # this try catches which format it is
-                if self.cmdtab[self.curr_command].arguments[arg_name].completer and\
-                   text[-1].isspace():
+                if self.cmdtab[self.curr_command].arguments[arg_name].completer:
                     try:
                         for comp in self.cmdtab[self.curr_command].arguments[arg_name].completer(
-                                prefix=prefix, action=None, parser=None, parsed_args=parse_args):
+                                parsed_args=parse_args):
 
                             for comp in gen_dyn_completion(
                                     comp, started_param, prefix, text):
