@@ -113,58 +113,81 @@ def high_contrast_style():
 
 
 def pastel_style():
-    return style_from_dict({
-        # Completion colors
-        Token.Menu.Completions.Completion.Current: 'bg:#56BAEC #ffffff',
-        Token.Menu.Completions.Completion: 'bg:#B4D8E7 #ffffff',
-        Token.Menu.Completions.ProgressButton: 'bg:#b78991',
-        Token.Menu.Completions.ProgressBar: 'bg:#ffc0cb',
-
-        Token.Az: '#FFAEAE',
-        Token.Prompt.Arg: '#B0E57C',
-
-        # Pretty Words
-        Token.Keyword: '#FFEC94',
-        Token.Keyword.Declaration: '#FFEC94',
-        Token.Name.Class: '#FFEC94',
-        Token.Text: '#B4D8E7',
-
-        Token.Line: '#FFF0AA',
-        Token.Number: '#FFF0AA',
-        # toolbar
-        Token.Operator: 'bg:#000000 #ffffff',
-        Token.Toolbar: 'bg:#000000 #ffffff'
-    })
+    return color_mapping(
+        'bg:#56BAEC #ffffff',
+        'bg:#B4D8E7 #ffffff',
+        '#FFAEAE',
+        '#FFEC94',
+        '#FFEC94',
+        '#FFEC94',
+        '#B4D8E7',
+        '#FFF0AA',
+        '#FFF0AA',
+        'bg:#000000 #ffffff')
 
 
 def halloween_style():
     """ halloween colors """
-    return style_from_dict({
-        # Completion colors
-        Token.Menu.Completions.Completion.Current: 'bg:#7A3E48 #ffffff',
-        Token.Menu.Completions.Completion: 'bg:#3D3242 #ffffff',
-        Token.Menu.Completions.ProgressButton: 'bg:#b78991',
-        Token.Menu.Completions.ProgressBar: 'bg:#ffc0cb',
-
-        Token.Az: '#3D3242',
-        Token.Prompt.Arg: '#3D3242',
-
-        # Pretty Words
-        Token.Keyword: '#7A3E48',
-        Token.Keyword.Declaration: '#7A3E48',
-        Token.Name.Class: '#B95835',
-        Token.Text: '#E18942',
-
-        Token.Line: '#EECD86',
-        Token.Number: '#EECD86',
-        # toolbar
-        Token.Operator: 'bg:#000000 #ffffff',
-        Token.Toolbar: 'bg:#000000 #ffffff'
-    })
+    return color_mapping(
+        'bg:#7A3E48 #ffffff',
+        'bg:#3D3242 #ffffff',
+        '#3D3242',
+        '#7A3E48',
+        '#7A3E48',
+        '#B95835',
+        '#E18942',
+        '#EECD86',
+        '#EECD86',
+        'bg:#000000 #ffffff',
+    )
 
 
-def dark_style():
-    return color_ma
+def grey_style():
+    """ a very grey scheme """
+    return color_mapping(
+        'bg:#555555 #ffffff',
+        'bg:#444444 #ffffff',
+        '#000044',
+        '#000044',
+        '#000044',
+        '#333333',
+        '#222222',
+        '#777777',
+        '#777777',
+        'bg:#000000 #ffffff',
+    )
+
+
+def blue_red_style():
+    """ a red and blue ish scheme """
+    return color_mapping(
+        'bg:#F0ECEB #ffffff',
+        'bg:#6C7476 #ffffff',
+        '#EE3233',
+        '#66A7C5',
+        '#66A7C5',
+        '#EE3233',
+        '#EE3233',
+        '#A3D6F5',
+        '#A3D6F5',
+        'bg:#000000 #ffffff',
+    )
+
+
+def blue_green_style():
+    """ a blue green style """
+    return color_mapping(
+        'bg:#89E894 #ffffff',
+        'bg:#BED661 #ffffff',
+        '#89E894',
+        '#34DDDD',
+        '#93E2D5',
+        '#78D5E3',
+        '#BED661',
+        '#7AF5F5',
+        '#78D5E3',
+        'bg:#ffffff #000000',
+    )
 
 
 OPTIONS = {
@@ -174,7 +197,10 @@ OPTIONS = {
     'none' : no_style_wrapper,
     'contrast' : high_contrast_style,
     'pastel' : pastel_style,
-    'halloween' : halloween_style
+    'halloween' : halloween_style,
+    'grey' : grey_style,
+    'br' : blue_red_style,
+    'bg' : blue_green_style
 }
 
 
