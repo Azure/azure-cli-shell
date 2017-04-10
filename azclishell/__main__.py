@@ -18,7 +18,7 @@ from azclishell.gather_commands import GatherCommands
 from azclishell.app import Shell
 from azclishell.az_completer import AzCompleter
 from azclishell.az_lexer import AzLexer
-from azclishell.color_styles import default_style, quiet_style
+from azclishell.color_styles import style_factory, get_options
 
 from azure.cli.core.application import APPLICATION
 from azure.cli.core._session import ACCOUNT, CONFIG, SESSION
@@ -34,12 +34,16 @@ def main(args):
 
     parser = argparse.ArgumentParser(prog='az-shell')
     parser.add_argument(
-        '--no-style', dest='style', action='store_true', help='the colors of the shell')
+        '--style', dest='style', help='the colors of the shell',
+        choices=get_options())
     args = parser.parse_args(args)
 
-    style = quiet_style()
     if args.style:
-        style = None
+        given_style = args.style
+    else:
+        given_style = None
+
+    style = style_factory(given_style)
 
     azure_folder = cli_config_dir()
     if not os.path.exists(azure_folder):
