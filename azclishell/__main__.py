@@ -38,13 +38,6 @@ def main(args):
         choices=get_options())
     args = parser.parse_args(args)
 
-    if args.style:
-        given_style = args.style
-    else:
-        given_style = None
-
-    style = style_factory(given_style)
-
     azure_folder = cli_config_dir()
     if not os.path.exists(azure_folder):
         os.makedirs(azure_folder)
@@ -55,6 +48,15 @@ def main(args):
 
     config = SHELL_CONFIGURATION
     shell_config_dir = azclishell.configuration.get_config_dir
+
+    if args.style:
+        given_style = args.style
+        config.set_style(given_style)
+    else:
+        given_style = config.get_style()
+
+    style = style_factory(given_style)
+
 
     if config.BOOLEAN_STATES[config.config.get('DEFAULT', 'firsttime')]:
         print("When in doubt, ask for 'help'")

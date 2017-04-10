@@ -189,6 +189,21 @@ def blue_green_style():
         'bg:#ffffff #000000',
     )
 
+def primary_style():
+    """ a blue green style """
+    return color_mapping(
+        'bg:#449adf #ffffff',
+        'bg:#002685 #ffffff',
+        '#cd1e10',
+        '#007e3a',
+        '#fe79d1',
+        '#4cde77',
+        '#763931',
+        '#64d13e',
+        '#7e77d2',
+        'bg:#000000 #ffffff',
+    )
+
 
 OPTIONS = {
     'quiet' : quiet_style,
@@ -200,7 +215,8 @@ OPTIONS = {
     'halloween' : halloween_style,
     'grey' : grey_style,
     'br' : blue_red_style,
-    'bg' : blue_green_style
+    'bg' : blue_green_style,
+    'primary' : primary_style
 }
 
 

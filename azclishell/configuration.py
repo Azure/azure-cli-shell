@@ -57,7 +57,7 @@ class Configuration(object):
     def __init__(self):
         self.config = configparser.ConfigParser({
             'firsttime' : 'yes',
-            'colors' : 'yes'
+            'style' : 'default'
         })
         self.config.add_section('Help Files')
         self.config.add_section('Layout')
@@ -99,6 +99,14 @@ class Configuration(object):
             set_global_config_value('core', 'collect_telemetry', ask_user_for_telemetry())
 
         self.update()
+
+    def get_style(self):
+        """ gets the last style they used """
+        return self.config.get('DEFAULT', 'style')
+
+    def set_style(self, val):
+        """ sets the style they used """
+        self.set_val('DEFAULT', 'style', val)
 
     def set_val(self, direct, section, val):
         """ set the config values """
