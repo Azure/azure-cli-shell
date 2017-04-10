@@ -3,7 +3,7 @@ import platform
 from prompt_toolkit.styles import style_from_dict
 from pygments.token import Token
 
-
+# pylint: disable=R0913
 def color_mapping(curr_completion, completion, prompt, command, subcommand,
                   param, text, line, example, toolbar):
 
@@ -39,131 +39,77 @@ def no_style_wrapper():
 def default_style():
     """ Default coloring """
     if platform.system() == 'Windows':
-        styles = style_from_dict({
-            # Completion colors
-            Token.Menu.Completions.Completion.Current: 'bg:#7c2c80 #ffffff',
-            Token.Menu.Completions.Completion: 'bg:#00b7b7 #ffffff',
-            Token.Menu.Completions.ProgressButton: 'bg:#b78991',
-            Token.Menu.Completions.ProgressBar: 'bg:#ffc0cb',
-
-            Token.Az: '#7c2c80',
-            Token.Prompt.Arg: '#888888',
-
-            # Pretty Words
-            Token.Keyword: '#965699',
-            Token.Keyword.Declaration: '#ab77ad',
-            Token.Name.Class: '#c49fc5',
-            Token.Text: '#0f5050',
-
-            Token.Line: '#E500E5',
-            Token.Number: '#00ffff',
-            # toolbar
-            Token.Operator: 'bg:#000000 #ffffff',
-            Token.Toolbar: 'bg:#000000 #ffffff'
-        })
+        styles = color_mapping(
+            'bg:#7c2c80 #ffffff',
+            'bg:#00b7b7 #ffffff',
+            '#7c2c80',
+            '#965699',
+            '#ab77ad',
+            '#c49fc5',
+            '#0f5050',
+            '#E500E5',
+            '#00ffff',
+            'bg:#000000 #ffffff')
 
     else:
-        styles = style_from_dict({
-            # Completion colors
-            Token.Menu.Completions.Completion.Current: 'bg:#7c2c80 #ffffff',
-            Token.Menu.Completions.Completion: 'bg:#00b7b7 #ffffff',
-            Token.Menu.Completions.ProgressButton: 'bg:#b78991',
-            Token.Menu.Completions.ProgressBar: 'bg:#ffc0cb',
-
-            Token.Az: '#7c2c80',
-            Token.Prompt.Arg: '#888888',
-
-            # Pretty Words
-            Token.Keyword: '#965699',
-            Token.Keyword.Declaration: '#ab77ad',
-            Token.Name.Class: '#c49fc5',
-            Token.Text: '#666666',
-
-            Token.Line: '#E500E5',
-            Token.Number: '#3d79db',
-            # toolbar
-            Token.Operator: 'bg:#000000 #ffffff',
-            Token.Toolbar: 'bg:#000000 #ffffff'
-        })
+        styles = color_mapping(
+            'bg:#7c2c80 #ffffff',
+            'bg:#00b7b7 #ffffff',
+            '#7c2c80',
+            '#965699',
+            '#ab77ad',
+            '#c49fc5',
+            '#666666',
+            '#E500E5',
+            '#3d79db',
+            'bg:#000000 #ffffff')
 
     return styles
 
 
 def quiet_style():
     """ a quiet color palette """
-    return style_from_dict({
-        # Completion colors
-        Token.Menu.Completions.Completion.Current: 'bg:#6D929B #ffffff',
-        Token.Menu.Completions.Completion: 'bg:#00b7b7 #ffffff',
-        Token.Menu.Completions.ProgressButton: 'bg:#b78991',
-        Token.Menu.Completions.ProgressBar: 'bg:#ffc0cb',
+    return color_mapping(
+        'bg:#6D929B #ffffff',
+        'bg:#00b7b7 #ffffff',
+        '#6D929B',
+        '#C1DAD6',
+        '#ACD1E9',
+        '#B7AFA3',
+        '#666666',
+        '#6D929B',
+        '#C1DAD6',
+        'bg:#000000 #ffffff')
 
-        Token.Az: '#6D929B',
-        Token.Prompt.Arg: '#E8D0A9',
-
-        # Pretty Words
-        Token.Keyword: '#C1DAD6',
-        Token.Keyword.Declaration: '#ACD1E9',
-        Token.Name.Class: '#B7AFA3',
-        Token.Text: '#666666',
-
-        Token.Line: '#6D929B',
-        Token.Number: '#C1DAD6',
-        # toolbar
-        Token.Operator: 'bg:#000000 #ffffff',
-        Token.Toolbar: 'bg:#000000 #ffffff'
-    })
 
 def purple_style():
     """ a purple palette """
-    return style_from_dict({
-        # Completion colors
-        Token.Menu.Completions.Completion.Current: 'bg:#C3C3E5 #ffffff',
-        Token.Menu.Completions.Completion: 'bg:#8C489F #ffffff',
-        Token.Menu.Completions.ProgressButton: 'bg:#b78991',
-        Token.Menu.Completions.ProgressBar: 'bg:#ffc0cb',
-
-        Token.Az: '#8C489F',
-        Token.Prompt.Arg: '#8C489F',
-
-        # Pretty Words
-        Token.Keyword: '#443266',
-        Token.Keyword.Declaration: '#443266',
-        Token.Name.Class: '#443266',
-        Token.Text: '#C3C3E5',
-
-        Token.Line: '#C3C3E5',
-        Token.Number: '#C3C3E5',
-        # toolbar
-        Token.Operator: 'bg:#000000 #ffffff',
-        Token.Toolbar: 'bg:#000000 #ffffff'
-    })
+    return color_mapping(
+        'bg:#C3C3E5 #ffffff',
+        'bg:#8C489F #ffffff',
+        '#8C489F',
+        '#443266',
+        '#443266',
+        '#443266',
+        '#C3C3E5',
+        '#C3C3E5',
+        '#C3C3E5',
+        'bg:#000000 #ffffff')
 
 
 def high_contrast_style():
     """ a high contrast palette """
-    return style_from_dict({
-        # Completion colors
-        Token.Menu.Completions.Completion.Current: 'bg:#DD1111 #ffffff',
-        Token.Menu.Completions.Completion: 'bg:#CC0000 #ffffff',
-        Token.Menu.Completions.ProgressButton: 'bg:#b78991',
-        Token.Menu.Completions.ProgressBar: 'bg:#ffc0cb',
-
-        Token.Az: '#3333FF',
-        Token.Prompt.Arg: '#3333FF',
-
-        # Pretty Words
-        Token.Keyword: '#FFCC00',
-        Token.Keyword.Declaration: '#FFCC00',
-        Token.Name.Class: '#FFCC00',
-        Token.Text: '#99FF00',
-
-        Token.Line: '#99FF00',
-        Token.Number: '#99FF00',
-        # toolbar
-        Token.Operator: 'bg:#000000 #ffffff',
-        Token.Toolbar: 'bg:#000000 #ffffff'
-    })
+    return color_mapping(
+        'bg:#DD1111 #ffffff',
+        'bg:#CC0000 #ffffff',
+        '#3333FF',
+        '#FFCC00',
+        '#FFCC00',
+        '#FFCC00',
+        '#99FF00',
+        '#99FF00',
+        '#99FF00',
+        'bg:#000000 #ffffff')
 
 
 def pastel_style():
@@ -215,6 +161,10 @@ def halloween_style():
         Token.Operator: 'bg:#000000 #ffffff',
         Token.Toolbar: 'bg:#000000 #ffffff'
     })
+
+
+def dark_style():
+    return color_ma
 
 
 OPTIONS = {
