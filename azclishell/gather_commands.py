@@ -86,11 +86,6 @@ class GatherCommands(object):
         self.command_param["quit"] = ""
         self.command_param["exit"] = ""
 
-        self.completable.append("az")
-        self.descrip["az"] = ""
-        self.command_tree.children.append(CommandBranch("az"))
-        self.command_param["az"] = ""
-
     def gather_from_files(self):
         """ gathers from the files in a way that is convienent to use """
         command_file = CONFIGURATION.get_help_files()

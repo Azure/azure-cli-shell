@@ -54,11 +54,11 @@ def reformat_cmd(text):
     # remove az if there
     text = text.replace('az', '')
     # disregard defaulting symbols
-    if SELECT_SYMBOL['default'] in text:
-        text = text.replace(SELECT_SYMBOL['default'], "")
+    if SELECT_SYMBOL['scope'] in text:
+        text = text.replace(SELECT_SYMBOL['scope'], "")
 
-    if SELECT_SYMBOL['undefault'] in text:
-        text = text.replace(SELECT_SYMBOL['undefault'], "")
+    if SELECT_SYMBOL['unscope'] in text:
+        text = text.replace(SELECT_SYMBOL['unscope'], "")
 
     if get_scope():
         text = get_scope() + ' ' + text
@@ -76,6 +76,11 @@ def gen_dyn_completion(comp, started_param, prefix, text):
             yield Completion(completion, -len(prefix))
     else:
         yield Completion(completion, -len(prefix))
+
+
+def sort_completions(gen):
+    """ sorts the completions """
+    return sorted(list(gen), key=lambda a: a.text)
 
 
 # pylint: disable=too-many-instance-attributes
@@ -133,18 +138,18 @@ class AzCompleter(Completer):
         self._is_command = True
 
         text = reformat_cmd(text)
-
         if text.split():
-            for comp in self.gen_cmd_and_param_completions(text):
+
+            for comp in sort_completions(self.gen_cmd_and_param_completions(text)):
                 yield comp
 
-        for cmd in self.gen_cmd_completions(text):
+        for cmd in sort_completions(self.gen_cmd_completions(text)):
             yield cmd
 
-        for val in self.gen_dynamic_completions(text):
+        for val in sort_completions(self.gen_dynamic_completions(text)):
             yield val
 
-        for param in self.gen_global_param_completions(text):
+        for param in sort_completions(self.gen_global_param_completions(text)):
             yield param
 
     def gen_enum_completions(self, arg_name, text, started_param, prefix):
@@ -180,11 +185,12 @@ class AzCompleter(Completer):
             # command table specific name
             arg_name = self.get_arg_name(is_param, param)
 
-            if arg_name and (text.split()[-1].startswith('-') or
+            if arg_name and ((text.split()[-1].startswith('-') and text[-1].isspace()) or
                              text.split()[-2].startswith('-')):
-                # enumeration completions
-                self.gen_enum_completions(arg_name, text, started_param, prefix)
-                # parse for certain values
+
+                for comp in self.gen_enum_completions(arg_name, text, started_param, prefix):
+                    yield comp
+
                 parse_args = self.argsfinder.get_parsed_args(
                     parse_quotes(text, quotes=False))
 
@@ -193,7 +199,7 @@ class AzCompleter(Completer):
                 if self.cmdtab[self.curr_command].arguments[arg_name].completer:
                     try:
                         for comp in self.cmdtab[self.curr_command].arguments[arg_name].completer(
-                                prefix=prefix, action=None, parser=None, parsed_args=parse_args):
+                                parsed_args=parse_args):
 
                             for comp in gen_dyn_completion(
                                     comp, started_param, prefix, text):
@@ -243,8 +249,9 @@ class AzCompleter(Completer):
         for word in txtspt:
             if word.startswith("-"):
                 self._is_command = False
-            else:
-                # building what the command is
+
+            # building what the command is
+            elif self._is_command:
                 temp_command += ' ' + str(word) if temp_command else str(word)
 
             if self.branch.has_child(word):  # moving down command tree
@@ -262,7 +269,6 @@ class AzCompleter(Completer):
         # this is for single char parameters
         if last_word.startswith("-") and not last_word.startswith("--"):
             self._is_command = False
-
             if self.has_parameters(self.curr_command):
                 for param in self.command_parameters[self.curr_command]:
                     if self.validate_completion(param, last_word, text) and\

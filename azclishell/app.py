@@ -15,6 +15,7 @@ import jmespath
 
 import azclishell.configuration
 from azclishell.az_lexer import AzLexer, ExampleLexer, ToolbarLexer
+from azclishell.command_tree import in_tree
 from azclishell.gather_commands import add_random_new_lines
 from azclishell.key_bindings import registry, get_section, sub_section
 from azclishell.layout import create_layout, create_tutorial_layout, set_scope
@@ -104,7 +105,7 @@ def _toolbar_info():
         " [F1]Layout",
         "[F2]Defaults",
         "[F3]Keys",
-        "[Crtl+Q]Quit",
+        "[Crtl+D]Quit",
         tool_val
     ]
     return settings_items
@@ -145,7 +146,7 @@ class Shell(object):
         self.description_docs = u''
         self.param_docs = u''
         self.example_docs = u''
-        self._env = os.environ.copy()
+        self._env = os.environ
         self.last = None
         self.last_exit = 0
         self.input = input_custom
@@ -298,11 +299,9 @@ class Shell(object):
                 cursor_position=position))
         self.cli.request_redraw()
 
-    def handle_scoping(self, text):
+    def set_scope(self, value):
         """ narrows the scopes the commands """
-        if not text:
-            return ''
-        value = text[0]
+
         set_scope(value)
         if self.default_command:
             self.default_command += ' ' + value
@@ -310,7 +309,7 @@ class Shell(object):
             self.default_command += value
         return value
 
-    def handle_example(self, text):
+    def handle_example(self, text, continue_flag):
         """ parses for the tutorial """
         cmd = text.partition(SELECT_SYMBOL['example'])[0].rstrip()
         num = text.partition(SELECT_SYMBOL['example'])[2].strip()
@@ -341,9 +340,9 @@ class Shell(object):
                 flag_fill = False
             counter += 1
 
-        return self.example_repl(example_no_fill, example, starting_index)
+        return self.example_repl(example_no_fill, example, starting_index, continue_flag)
 
-    def example_repl(self, text, example, start_index):
+    def example_repl(self, text, example, start_index, continue_flag):
         """ REPL for interactive tutorials """
 
         if start_index:
@@ -381,15 +380,15 @@ class Shell(object):
         else:
             cmd = text
 
-        return cmd
+        return cmd, continue_flag
 
     # pylint: disable=too-many-branches
     def _special_cases(self, text, cmd, outside):
         break_flag = False
         continue_flag = False
-        if 'az' in text:
+        if text and text.split()[0].lower() == 'az':
             telemetry.track_ssg('az', text)
-            cmd = cmd.replace('az', '')
+            cmd = ' '.join(text.split()[1:])
         if self.default_command:
             cmd = self.default_command + " " + cmd
 
@@ -429,7 +428,7 @@ class Shell(object):
                 cmd = "az " + cmd
 
             elif SELECT_SYMBOL['example'] in text:
-                cmd = self.handle_example(cmd)
+                cmd = self.handle_example(cmd, continue_flag)
                 telemetry.track_ssg('tutorial', text)
 
         continue_flag, cmd = self.handle_scoping_input(continue_flag, cmd, text)
@@ -459,19 +458,35 @@ class Shell(object):
         return continue_flag
 
     def handle_scoping_input(self, continue_flag, cmd, text):
-        if SELECT_SYMBOL['default'] in text:
-            default = text.partition(SELECT_SYMBOL['default'])[2].split()
-            value = self.handle_scoping(default)
-            print("defaulting: " + value)
-            cmd = cmd.replace(SELECT_SYMBOL['default'], '')
-            telemetry.track_ssg('default command', value)
 
-        if SELECT_SYMBOL['undefault'] in text:
-            value = text.partition(SELECT_SYMBOL['undefault'])[2].split()
+        if SELECT_SYMBOL['scope'] in text:
+            default = text.partition(SELECT_SYMBOL['scope'])[2]
+            if not text:
+                value = ''
+            else:
+                value = default
+
+            if self.default_command:
+                tree_val = self.default_command + " " + value
+            else:
+                tree_val = value
+
+            if in_tree(self.completer.command_tree, tree_val):
+                self.set_scope(value)
+                print("defaulting: " + value)
+                cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
+                telemetry.track_ssg('scope command', value)
+            else:
+                print("Scope must be a valid command")
+
+            continue_flag = True
+
+        if SELECT_SYMBOL['unscope'] in text:
+            value = text.partition(SELECT_SYMBOL['unscope'])[2].split()
             if len(value) == 0:
                 self.default_command = ""
                 set_scope("", add=False)
-                print('undefaulting all')
+                print('unscoping all')
             elif len(value) == 1 and len(self.default_command.split()) > 0\
                     and value[0] == self.default_command.split()[-1]:
                 self.default_command = ' ' + ' '.join(self.default_command.split()[:-1])
@@ -479,8 +494,8 @@ class Shell(object):
                 if not self.default_command.strip():
                     self.default_command = self.default_command.strip()
                 set_scope(self.default_command, add=False)
-                print('undefaulting: ' + value[0])
-            cmd = cmd.replace(SELECT_SYMBOL['undefault'], '')
+                print('unscoping: ' + value[0])
+            cmd = cmd.replace(SELECT_SYMBOL['unscope'], '')
             continue_flag = True
         return continue_flag, cmd
 
@@ -526,31 +541,34 @@ class Shell(object):
 
         while True:
             try:
-                document = self.cli.run(reset_current_buffer=True)
-                text = document.text
-                if not text:  # not input
-                    self.set_prompt()
-                    continue
-                cmd = text
-                outside = False
-            except AttributeError:  # when the user pressed Control Q
-                break
-            else:
-                b_flag, c_flag, outside, cmd = self._special_cases(text, cmd, outside)
-                if b_flag:
+                try:
+                    document = self.cli.run(reset_current_buffer=True)
+                    text = document.text
+                    if not text:  # not input
+                        self.set_prompt()
+                        continue
+                    cmd = text
+                    outside = False
+                except AttributeError:  # when the user pressed Control D
                     break
-                if c_flag:
-                    self.set_prompt()
-                    continue
-
-                if not self.default_command:
-                    self.history.append(text)
-
-                self.set_prompt()
-                if outside:
-                    subprocess.Popen(cmd, shell=True).communicate()
                 else:
-                    self.cli_execute(cmd)
+                    b_flag, c_flag, outside, cmd = self._special_cases(text, cmd, outside)
+                    if b_flag:
+                        break
+                    if c_flag:
+                        self.set_prompt()
+                        continue
+
+                    if not self.default_command:
+                        self.history.append(text)
+
+                    self.set_prompt()
+                    if outside:
+                        subprocess.Popen(cmd, shell=True).communicate()
+                    else:
+                        self.cli_execute(cmd)
+            except KeyboardInterrupt:  # CTRL C
+                continue
 
         print('Have a lovely day!!')
         telemetry.conclude()
