@@ -18,7 +18,7 @@ from azclishell.gather_commands import GatherCommands
 from azclishell.app import Shell
 from azclishell.az_completer import AzCompleter
 from azclishell.az_lexer import AzLexer
-from azclishell.util import default_style
+from azclishell.color_styles import default_style, quiet_style
 
 from azure.cli.core.application import APPLICATION
 from azure.cli.core._session import ACCOUNT, CONFIG, SESSION
@@ -37,7 +37,7 @@ def main(args):
         '--no-style', dest='style', action='store_true', help='the colors of the shell')
     args = parser.parse_args(args)
 
-    style = default_style()
+    style = quiet_style()
     if args.style:
         style = None
 
