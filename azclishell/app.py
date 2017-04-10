@@ -319,10 +319,13 @@ class Shell(object):
         except ValueError:
             print("An Integer should follow the colon")
             return ""
-        if cmd in self.completer.command_examples and num >= 0 and\
-           num < len(self.completer.command_examples[cmd]):
-            example = self.completer.command_examples[cmd][num][1]
-            example = example.replace('\n', '')
+        if cmd in self.completer.command_examples:
+            if num >= 0 and num < len(self.completer.command_examples[cmd]):
+                example = self.completer.command_examples[cmd][num][1]
+                example = example.replace('\n', '')
+            else:
+                print('Invalid example number')
+                return '', True
 
         example = example.replace('az', '')
 
@@ -366,7 +369,7 @@ class Shell(object):
                 example_cli.request_redraw()
                 answer = example_cli.run()
                 if not answer:
-                    return ""
+                    return "", True
                 answer = answer.text
                 if answer.strip('\n') == cmd.strip('\n'):
                     continue
@@ -428,7 +431,7 @@ class Shell(object):
                 cmd = "az " + cmd
 
             elif SELECT_SYMBOL['example'] in text:
-                cmd = self.handle_example(cmd, continue_flag)
+                cmd, continue_flag = self.handle_example(cmd, continue_flag)
                 telemetry.track_ssg('tutorial', text)
 
         continue_flag, cmd = self.handle_scoping_input(continue_flag, cmd, text)

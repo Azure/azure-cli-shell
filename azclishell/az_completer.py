@@ -18,9 +18,16 @@ from azure.cli.core._util import CLIError
 
 
 SELECT_SYMBOL = azclishell.configuration.SELECT_SYMBOL
+
+GLOBAL_PARAM_DESCRIPTIONS = {
+    '--verbose' : 'Increase logging verbosity. Use --debug for full debug logs.',
+    '--debug' : 'Increase logging verbosity to show all debug logs.',
+    '--output' : 'Output format',
+    '-o' : 'Output format'
+}
 OUTPUT_CHOICES = ['json', 'tsv', 'table', 'jsonc']
 OUTPUT_OPTIONS = ['--output', '-o']
-GLOBAL_PARAM = OUTPUT_OPTIONS + ['--verbose', '--debug']
+GLOBAL_PARAM = GLOBAL_PARAM_DESCRIPTIONS.keys()
 
 
 def dynamic_param_logic(text):
@@ -29,16 +36,17 @@ def dynamic_param_logic(text):
     started_param = False
     prefix = ""
     param = ""
-    if text.split():
-        param = text.split()[-1]
+    txtspt = text.split()
+    if txtspt:
+        param = txtspt[-1]
         if param.startswith("-"):
             is_param = True
-        elif len(text.split()) > 2 and text.split()[-2]\
-                and text.split()[-2].startswith('-'):
+        elif len(txtspt) > 2 and txtspt[-2]\
+                and txtspt[-2].startswith('-'):
             is_param = True
-            param = text.split()[-2]
+            param = txtspt[-2]
             started_param = True
-            prefix = text.split()[-1]
+            prefix = txtspt[-1]
     return is_param, started_param, prefix, param
 
 
@@ -105,6 +113,7 @@ class AzCompleter(Completer):
         self.global_param = GLOBAL_PARAM if global_params else []
         self.output_choices = OUTPUT_CHOICES if global_params else []
         self.output_options = OUTPUT_OPTIONS if global_params else []
+        self.global_param_descriptions = GLOBAL_PARAM_DESCRIPTIONS if global_params else []
 
         self.global_parser = AzCliCommandParser(add_help=False)
         self.global_parser.add_argument_group('global', 'Global Arguments')
@@ -145,7 +154,8 @@ class AzCompleter(Completer):
             yield param
 
     def gen_enum_completions(self, arg_name, text, started_param, prefix):
-        try:  # if enum completion)
+        """ generates dynamic enumeration completions """
+        try:  # if enum completion
             for choice in self.cmdtab[
                     self.curr_command].arguments[arg_name].choices:
                 if started_param:
@@ -159,6 +169,7 @@ class AzCompleter(Completer):
             pass
 
     def get_arg_name(self, is_param, param):
+        """ gets the argument name used in the command table for a parameter """
         if self.curr_command in self.cmdtab and is_param:
             for arg in self.cmdtab[self.curr_command].arguments:
 
@@ -172,7 +183,7 @@ class AzCompleter(Completer):
         try:  # pylint: disable=too-many-nested-blocks
             is_param, started_param, prefix, param = dynamic_param_logic(text)
 
-            # dynamic param completion
+            # command table specific name
             arg_name = self.get_arg_name(is_param, param)
 
             if arg_name and ((text.split()[-1].startswith('-') and text[-1].isspace()) or
@@ -235,13 +246,16 @@ class AzCompleter(Completer):
     def gen_cmd_and_param_completions(self, text):
         """ generates command and parameter completions """
         temp_command = str('')
-        for word in text.split():
+        txtspt = text.split()
+        for word in txtspt:
             if word.startswith("-"):
                 self._is_command = False
+
+            # building what the command is
             elif self._is_command:
                 temp_command += ' ' + str(word) if temp_command else str(word)
 
-            if self.branch.has_child(word):
+            if self.branch.has_child(word):  # moving down command tree
                 self.branch = self.branch.get_child(word, self.branch.children)
 
         if len(text) > 0 and text[-1].isspace():
@@ -252,7 +266,7 @@ class AzCompleter(Completer):
         else:
             self.curr_command = temp_command
 
-        last_word = text.split()[-1]
+        last_word = txtspt[-1]
         # this is for single char parameters
         if last_word.startswith("-") and not last_word.startswith("--"):
             self._is_command = False
@@ -277,32 +291,39 @@ class AzCompleter(Completer):
 
         if self.branch.children is not None and self._is_command:  # all underneath commands
             for kid in self.branch.children:
-                if self.validate_completion(kid.data, text.split()[-1], text, False):
+                if self.validate_completion(kid.data, txtspt[-1], text, False):
                     yield Completion(
-                        str(kid.data), -len(text.split()[-1]))
+                        str(kid.data), -len(txtspt[-1]))
 
     def gen_global_param_completions(self, text):
         """ Global parameter stuff hard-coded in """
-        if text.split() and len(text.split()) > 0:
+        txtspt = text.split()
+        if txtspt and len(txtspt) > 0:
             for param in self.global_param:
-                if text.split()[-1].startswith('-') \
-                        and not text.split()[-1].startswith('--') and \
+                # for single dash global parameters
+                if txtspt[-1].startswith('-') \
+                        and not txtspt[-1].startswith('--') and \
                         param.startswith('-') and not param.startswith('--') and\
-                        self.validate_completion(param, text.split()[-1], text, double=False):
-                    yield Completion(param, -len(text.split()[-1]))
-
-                elif text.split()[-1].startswith('--') and \
-                        self.validate_completion(param, text.split()[-1], text, double=False):
-                    yield Completion(param, -len(text.split()[-1]))
-
-            if text.split()[-1] in self.output_options:
+                        self.validate_completion(param, txtspt[-1], text, double=False):
+                    yield Completion(
+                        param, -len(txtspt[-1]),
+                        display_meta=GLOBAL_PARAM_DESCRIPTIONS[param])
+                # for double dash global parameters
+                elif txtspt[-1].startswith('--') and \
+                        self.validate_completion(param, txtspt[-1], text, double=False):
+                    yield Completion(
+                        param, -len(txtspt[-1]),
+                        display_meta=GLOBAL_PARAM_DESCRIPTIONS[param])
+            # if there is an output, gets the options without user typing
+            if txtspt[-1] in self.output_options:
                 for opt in self.output_choices:
                     yield Completion(opt)
-            if len(text.split()) > 1 and\
-                    text.split()[-2] in self.output_options:
+            # if there is an output option, if they have started typing
+            if len(txtspt) > 1 and\
+                    txtspt[-2] in self.output_options:
                 for opt in self.output_choices:
-                    if self.validate_completion(opt, text.split()[-1], text, double=False):
-                        yield Completion(opt, -len(text.split()[-1]))
+                    if self.validate_completion(opt, txtspt[-1], text, double=False):
+                        yield Completion(opt, -len(txtspt[-1]))
 
     def is_completable(self, symbol):
         """ whether the word can be completed as a command or parameter """
