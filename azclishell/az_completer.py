@@ -81,7 +81,13 @@ def gen_dyn_completion(comp, started_param, prefix, text):
 
 def sort_completions(gen):
     """ sorts the completions """
-    return sorted(list(gen), key=lambda a: a.text)
+    def _get_weight(val):
+        priority = ''
+        if val.display_meta and val.display_meta.startswith('[REQUIRED]'):
+            priority = ' '  # a space has the lowest ordinance
+        return priority + val.text
+
+    return sorted(list(gen), key=_get_weight)
 
 
 # pylint: disable=too-many-instance-attributes
