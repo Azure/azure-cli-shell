@@ -255,7 +255,7 @@ class AzCompleter(Completer):
             elif self._is_command:
                 temp_command += ' ' + str(word) if temp_command else str(word)
 
-            if self.branch.has_child(word):  # moving down command tree
+            if self.branch.has_child(word) and text[-1].isspace():  # moving down command tree
                 self.branch = self.branch.get_child(word, self.branch.children)
 
         if len(text) > 0 and text[-1].isspace():
