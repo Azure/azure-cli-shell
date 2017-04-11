@@ -7,7 +7,7 @@ from setuptools import setup
 
 DEPENDENCIES = [
     'applicationinsights',
-    'azure-cli',
+    'azure-cli==2.0.2',
     'jmespath',
     'prompt_toolkit',
     'pyyaml',
