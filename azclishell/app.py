@@ -423,6 +423,7 @@ class Shell(object):
                     meaning = 'Success'
                 else:
                     meaning = 'Failure'
+
                 print(meaning + ": " + str(self.last_exit))
                 continue_flag = True
                 telemetry.track_ssg('exit code', cmd)
