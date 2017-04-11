@@ -81,7 +81,9 @@ def gen_dyn_completion(comp, started_param, prefix, text):
 
 def sort_completions(gen):
     """ sorts the completions """
+
     def _get_weight(val):
+        """ weights the completions with required things first the lexicographically"""
         priority = ''
         if val.display_meta and val.display_meta.startswith('[REQUIRED]'):
             priority = ' '  # a space has the lowest ordinance
