@@ -184,6 +184,10 @@ class CompletionTest(unittest.TestCase):
         with self.assertRaises(StopIteration):
             six.next(gen)
 
+        doc = Document(u'create --funtimes "life" --hello')
+        gen = self.completer.get_completions(doc, None)
+        self.assertEqual(six.next(gen), Completion(
+            "--helloworld", -7))
 
 if __name__ == '__main__':
     unittest.main()
