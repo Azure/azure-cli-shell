@@ -5,6 +5,8 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from prompt_toolkit.completion import Completer, Completion
+
 import azclishell.configuration
 from azclishell.argfinder import ArgsFinder
 from azclishell.command_tree import in_tree
@@ -14,7 +16,6 @@ from azclishell.util import parse_quotes
 from azure.cli.core.parser import AzCliCommandParser
 from azure.cli.core._util import CLIError
 
-from prompt_toolkit.completion import Completer, Completion
 
 SELECT_SYMBOL = azclishell.configuration.SELECT_SYMBOL
 
