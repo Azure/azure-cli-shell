@@ -514,7 +514,7 @@ class Shell(object):
             CONFIG.load(os.path.join(azure_folder, 'az.json'))
             SESSION.load(os.path.join(azure_folder, 'az.sess'), max_age=3600)
 
-            config = Configuration(args)
+            config = Configuration()
             self.app.initialize(config)
 
             result = self.app.execute(args)
