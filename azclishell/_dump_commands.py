@@ -11,12 +11,13 @@ import os
 import pkgutil
 import yaml
 
-from azure.cli.core.application import APPLICATION
-from azure.cli.core.commands import _update_command_definitions
+from azure.cli.core.application import APPLICATION, Configuration
+from azure.cli.core.commands import _update_command_definitions, BLACKLISTED_MODS
 from azure.cli.core.help_files import helps
 
 import azclishell.configuration as config
 
+APPLICATION.initialize(Configuration())
 CMD_TABLE = APPLICATION.configuration.get_command_table()
 
 
@@ -27,12 +28,16 @@ def install_modules():
     try:
         mods_ns_pkg = import_module('azure.cli.command_modules')
         installed_command_modules = [modname for _, modname, _ in
-                                     pkgutil.iter_modules(mods_ns_pkg.__path__)]
+                                     pkgutil.iter_modules(mods_ns_pkg.__path__)
+                                     if modname not in BLACKLISTED_MODS]
     except ImportError:
         pass
     for mod in installed_command_modules:
         try:
-            import_module('azure.cli.command_modules.' + mod).load_params(mod)
+            mod = import_module('azure.cli.command_modules.' + mod)
+            mod.load_params(mod)
+            mod.load_commands()
+
         except Exception:  # pylint: disable=broad-except
             print("Error loading: {}".format(mod))
     _update_command_definitions(CMD_TABLE)
@@ -48,7 +53,10 @@ def dump_command_table():
     for cmd in CMD_TABLE:
         com_descrip = {}
         param_descrip = {}
-        com_descrip['help'] = CMD_TABLE[cmd].description
+        command_description = CMD_TABLE[cmd].description
+        if callable(command_description):
+            command_description = command_description()
+        com_descrip['help'] = command_description
         com_descrip['examples'] = ""
 
         for key in CMD_TABLE[cmd].arguments:
@@ -83,6 +91,8 @@ def dump_command_table():
                     'help': diction_help["short-summary"],
                     'parameters' : {}
                 }
+            if callable(data[cmd]['help']):
+                data[cmd]['help'] = data[cmd]['help']()
 
         if cmd not in data:
             print("Command: {} not in Command Table".format(cmd))
