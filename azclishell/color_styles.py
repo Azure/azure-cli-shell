@@ -3,6 +3,7 @@ import platform
 from prompt_toolkit.styles import style_from_dict
 from pygments.token import Token
 
+
 # pylint: disable=R0913
 def color_mapping(curr_completion, completion, prompt, command, subcommand,
                   param, text, line, example, toolbar):
@@ -189,6 +190,7 @@ def blue_green_style():
         'bg:#ffffff #000000',
     )
 
+
 def primary_style():
     """ a blue green style """
     return color_mapping(
@@ -221,7 +223,6 @@ def neon_style():
     )
 
 
-
 OPTIONS = {
     'quiet' : quiet_style,
     'purple' : purple_style,
@@ -246,4 +247,3 @@ def style_factory(style):
 def get_options():
     """ all the color options """
     return OPTIONS.keys()
-

@@ -57,7 +57,6 @@ def main(args):
 
     style = style_factory(given_style)
 
-
     if config.BOOLEAN_STATES[config.config.get('DEFAULT', 'firsttime')]:
         print("When in doubt, ask for 'help'")
         config.firsttime()
