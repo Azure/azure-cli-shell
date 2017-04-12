@@ -479,13 +479,15 @@ class Shell(object):
                 set_scope("", add=False)
                 print('unscoping all')
 
-            elif in_tree(self.completer.command_tree, tree_val):
+            elif in_tree(self.completer.command_tree, tree_val.strip()):
                 self.set_scope(value)
                 print("defaulting: " + value)
                 cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
                 telemetry.track_ssg('scope command', value)
+            elif SELECT_SYMBOL['unscope'] not in text:
+                print("Scope must be a valid command")
 
-            elif SELECT_SYMBOL['unscope'] in text and \
+            while SELECT_SYMBOL['unscope'] in text and \
                  len(self.default_command.split()) > 0:
 
                 value = self.default_command.split()[-1]
@@ -495,9 +497,7 @@ class Shell(object):
                     self.default_command = self.default_command.strip()
                 set_scope(self.default_command, add=False)
                 print('unscoping: ' + value)
-
-            else:
-                print("Scope must be a valid command")
+                text = text.strip(SELECT_SYMBOL['unscope']).strip()
 
             cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
             continue_flag = True

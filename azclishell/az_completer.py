@@ -56,7 +56,7 @@ def reformat_cmd(text):
     text = text.replace('az', '')
     txtsplt = text.split()
     # disregard defaulting symbols
-    if text and text[-1].isspace() and SELECT_SYMBOL['scope'] == txtsplt[0]:
+    if text and text[-1].isspace() and txtsplt and SELECT_SYMBOL['scope'] == txtsplt[0]:
         text = text.replace(SELECT_SYMBOL['scope'], "")
 
     if get_scope():
