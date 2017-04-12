@@ -479,25 +479,25 @@ class Shell(object):
                 print("defaulting: " + value)
                 cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
                 telemetry.track_ssg('scope command', value)
-            else:
+            elif SELECT_SYMBOL['unscope'].split()[1] not in text:
                 print("Scope must be a valid command")
 
             continue_flag = True
 
-        if SELECT_SYMBOL['unscope'] in text:
-            value = text.partition(SELECT_SYMBOL['unscope'])[2].split()
-            if len(value) == 0:
-                self.default_command = ""
-                set_scope("", add=False)
-                print('unscoping all')
-            elif len(value) == 1 and len(self.default_command.split()) > 0\
-                    and value[0] == self.default_command.split()[-1]:
+        if SELECT_SYMBOL['unscope'] == text:
+            # value = text.partition(SELECT_SYMBOL['unscope'])[2].split()
+            # if len(value) == 0:
+                # self.default_command = ""
+                # set_scope("", add=False)
+                # print('unscoping all')
+            if len(self.default_command.split()) > 0:
+                value = self.default_command.split()[-1]
                 self.default_command = ' ' + ' '.join(self.default_command.split()[:-1])
 
                 if not self.default_command.strip():
                     self.default_command = self.default_command.strip()
                 set_scope(self.default_command, add=False)
-                print('unscoping: ' + value[0])
+                print('unscoping: ' + value)
             cmd = cmd.replace(SELECT_SYMBOL['unscope'], '')
             continue_flag = True
         return continue_flag, cmd
