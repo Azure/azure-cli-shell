@@ -54,12 +54,10 @@ def reformat_cmd(text):
     """ reformat the text to be stripped of noise """
     # remove az if there
     text = text.replace('az', '')
+    txtsplt = text.split()
     # disregard defaulting symbols
-    if SELECT_SYMBOL['scope'] in text:
+    if text and text[-1].isspace() and SELECT_SYMBOL['scope'] == txtsplt[0]:
         text = text.replace(SELECT_SYMBOL['scope'], "")
-
-    if SELECT_SYMBOL['unscope'] in text:
-        text = text.replace(SELECT_SYMBOL['unscope'], "")
 
     if get_scope():
         text = get_scope() + ' ' + text

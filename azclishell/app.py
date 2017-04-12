@@ -463,7 +463,7 @@ class Shell(object):
     def handle_scoping_input(self, continue_flag, cmd, text):
         txtspt = text.split()
         if SELECT_SYMBOL['scope'] == txtspt[0]:
-            default = text.partition(SELECT_SYMBOL['scope'])[2]
+            default = text.partition(SELECT_SYMBOL['scope'])[2].strip()
             if not text:
                 value = ''
             else:
@@ -485,7 +485,7 @@ class Shell(object):
                 cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
                 telemetry.track_ssg('scope command', value)
 
-            elif SELECT_SYMBOL['unscope'].split()[1] in text and \
+            elif SELECT_SYMBOL['unscope'] in text and \
                  len(self.default_command.split()) > 0:
 
                 value = self.default_command.split()[-1]
