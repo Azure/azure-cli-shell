@@ -18,6 +18,16 @@ ROWS, COLS = get_window_dim()
 TOLERANCE = 10
 LINE_MINIMUM = math.floor(int(COLS) / 2 - 15)
 
+GLOBAL_PARAM_DESCRIPTIONS = {
+    '--verbose' : 'Increase logging verbosity. Use --debug for full debug logs.',
+    '--debug' : 'Increase logging verbosity to show all debug logs.',
+    '--output' : 'Output format',
+    '-o' : 'Output format'
+}
+OUTPUT_CHOICES = ['json', 'tsv', 'table', 'jsonc']
+OUTPUT_OPTIONS = ['--output', '-o']
+GLOBAL_PARAM = GLOBAL_PARAM_DESCRIPTIONS.keys()
+
 
 def add_random_new_lines(long_phrase, line_min=LINE_MINIMUM, tolerance=TOLERANCE):
     """ not everything fits on the screen, based on the size, add newlines """
@@ -69,6 +79,11 @@ class GatherCommands(object):
         self.param_descript = {}
         self.completer = None
         self.same_param_doubles = {}
+
+        self.global_param_description = GLOBAL_PARAM_DESCRIPTIONS
+        self.output_choices = OUTPUT_CHOICES
+        self.output_options = OUTPUT_OPTIONS
+        self.global_param = GLOBAL_PARAM
 
         self.gather_from_files()
 

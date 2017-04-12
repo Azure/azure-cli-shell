@@ -16,18 +16,7 @@ from azclishell.util import parse_quotes
 from azure.cli.core.parser import AzCliCommandParser
 from azure.cli.core._util import CLIError
 
-
 SELECT_SYMBOL = azclishell.configuration.SELECT_SYMBOL
-
-GLOBAL_PARAM_DESCRIPTIONS = {
-    '--verbose' : 'Increase logging verbosity. Use --debug for full debug logs.',
-    '--debug' : 'Increase logging verbosity to show all debug logs.',
-    '--output' : 'Output format',
-    '-o' : 'Output format'
-}
-OUTPUT_CHOICES = ['json', 'tsv', 'table', 'jsonc']
-OUTPUT_OPTIONS = ['--output', '-o']
-GLOBAL_PARAM = GLOBAL_PARAM_DESCRIPTIONS.keys()
 
 
 def dynamic_param_logic(text):
@@ -110,10 +99,10 @@ class AzCompleter(Completer):
         self.branch = self.command_tree
         self.curr_command = ""
 
-        self.global_param = GLOBAL_PARAM if global_params else []
-        self.output_choices = OUTPUT_CHOICES if global_params else []
-        self.output_options = OUTPUT_OPTIONS if global_params else []
-        self.global_param_descriptions = GLOBAL_PARAM_DESCRIPTIONS if global_params else []
+        self.global_param = commands.global_param if global_params else []
+        self.output_choices = commands.output_choices if global_params else []
+        self.output_options = commands.output_options if global_params else []
+        self.global_param_descriptions = commands.global_param_descriptions if global_params else []
 
         self.global_parser = AzCliCommandParser(add_help=False)
         self.global_parser.add_argument_group('global', 'Global Arguments')
@@ -307,13 +296,13 @@ class AzCompleter(Completer):
                         self.validate_completion(param, txtspt[-1], text, double=False):
                     yield Completion(
                         param, -len(txtspt[-1]),
-                        display_meta=GLOBAL_PARAM_DESCRIPTIONS[param])
+                        display_meta=self.global_param_descriptions[param])
                 # for double dash global parameters
                 elif txtspt[-1].startswith('--') and \
                         self.validate_completion(param, txtspt[-1], text, double=False):
                     yield Completion(
                         param, -len(txtspt[-1]),
-                        display_meta=GLOBAL_PARAM_DESCRIPTIONS[param])
+                        display_meta=self.global_param_descriptions[param])
             # if there is an output, gets the options without user typing
             if txtspt[-1] in self.output_options:
                 for opt in self.output_choices:
