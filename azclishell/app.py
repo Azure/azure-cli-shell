@@ -462,42 +462,46 @@ class Shell(object):
 
     def handle_scoping_input(self, continue_flag, cmd, text):
         txtspt = text.split()
+        default_split = text.partition(SELECT_SYMBOL['scope'])[2].split()
+
         if SELECT_SYMBOL['scope'] == txtspt[0]:
-            default = text.partition(SELECT_SYMBOL['scope'])[2].strip()
-            if not text:
-                value = ''
-            else:
-                value = default
+            while default_split:
+                if not text:
+                    value = ''
+                else:
+                    value = default_split[0]
 
-            if self.default_command:
-                tree_val = self.default_command + " " + value
-            else:
-                tree_val = value
+                if self.default_command:
+                    tree_val = self.default_command + " " + value
+                else:
+                    tree_val = value
 
-            if len(txtspt) == 1:
-                self.default_command = ""
-                set_scope("", add=False)
-                print('unscoping all')
+                if len(txtspt) == 1:
+                    self.default_command = ""
+                    set_scope("", add=False)
+                    print('unscoping all')
 
-            elif in_tree(self.completer.command_tree, tree_val.strip()):
-                self.set_scope(value)
-                print("defaulting: " + value)
-                cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
-                telemetry.track_ssg('scope command', value)
-            elif SELECT_SYMBOL['unscope'] not in text:
-                print("Scope must be a valid command")
+                elif in_tree(self.completer.command_tree, tree_val.strip()):
+                    self.set_scope(value)
+                    print("defaulting: " + value)
+                    cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
+                    telemetry.track_ssg('scope command', value)
 
-            while SELECT_SYMBOL['unscope'] in text and \
-                 len(self.default_command.split()) > 0:
+                elif SELECT_SYMBOL['unscope'] == default_split[0] and \
+                    len(self.default_command.split()) > 0:
 
-                value = self.default_command.split()[-1]
-                self.default_command = ' ' + ' '.join(self.default_command.split()[:-1])
+                    value = self.default_command.split()[-1]
+                    self.default_command = ' ' + ' '.join(self.default_command.split()[:-1])
 
-                if not self.default_command.strip():
-                    self.default_command = self.default_command.strip()
-                set_scope(self.default_command, add=False)
-                print('unscoping: ' + value)
-                text = text.strip(SELECT_SYMBOL['unscope']).strip()
+                    if not self.default_command.strip():
+                        self.default_command = self.default_command.strip()
+                    set_scope(self.default_command, add=False)
+                    print('unscoping: ' + value)
+
+                elif SELECT_SYMBOL['unscope'] not in text:
+                    print("Scope must be a valid command")
+
+                default_split = default_split[1:]
 
             cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
             continue_flag = True
