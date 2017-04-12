@@ -22,11 +22,13 @@ GLOBAL_PARAM_DESCRIPTIONS = {
     '--verbose' : 'Increase logging verbosity. Use --debug for full debug logs.',
     '--debug' : 'Increase logging verbosity to show all debug logs.',
     '--output' : 'Output format',
-    '-o' : 'Output format'
+    '-o' : 'Output format',
+    '--help' : 'Get more information about a command',
+    '-h' : "Get more information about a command"
 }
 OUTPUT_CHOICES = ['json', 'tsv', 'table', 'jsonc']
 OUTPUT_OPTIONS = ['--output', '-o']
-GLOBAL_PARAM = GLOBAL_PARAM_DESCRIPTIONS.keys()
+GLOBAL_PARAM = list(GLOBAL_PARAM_DESCRIPTIONS.keys())
 
 
 def add_random_new_lines(long_phrase, line_min=LINE_MINIMUM, tolerance=TOLERANCE):
@@ -80,7 +82,7 @@ class GatherCommands(object):
         self.completer = None
         self.same_param_doubles = {}
 
-        self.global_param_description = GLOBAL_PARAM_DESCRIPTIONS
+        self.global_param_descriptions = GLOBAL_PARAM_DESCRIPTIONS
         self.output_choices = OUTPUT_CHOICES
         self.output_options = OUTPUT_OPTIONS
         self.global_param = GLOBAL_PARAM
