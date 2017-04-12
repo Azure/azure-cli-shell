@@ -461,8 +461,8 @@ class Shell(object):
         return continue_flag
 
     def handle_scoping_input(self, continue_flag, cmd, text):
-
-        if SELECT_SYMBOL['scope'] in text:
+        txtspt = text.split()
+        if SELECT_SYMBOL['scope'] == txtspt[0]:
             default = text.partition(SELECT_SYMBOL['scope'])[2]
             if not text:
                 value = ''
@@ -474,23 +474,20 @@ class Shell(object):
             else:
                 tree_val = value
 
-            if in_tree(self.completer.command_tree, tree_val):
+            if len(txtspt) == 1:
+                self.default_command = ""
+                set_scope("", add=False)
+                print('unscoping all')
+
+            elif in_tree(self.completer.command_tree, tree_val):
                 self.set_scope(value)
                 print("defaulting: " + value)
                 cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
                 telemetry.track_ssg('scope command', value)
-            elif SELECT_SYMBOL['unscope'].split()[1] not in text:
-                print("Scope must be a valid command")
 
-            continue_flag = True
+            elif SELECT_SYMBOL['unscope'].split()[1] in text and \
+                 len(self.default_command.split()) > 0:
 
-        if SELECT_SYMBOL['unscope'] == text:
-            # value = text.partition(SELECT_SYMBOL['unscope'])[2].split()
-            # if len(value) == 0:
-                # self.default_command = ""
-                # set_scope("", add=False)
-                # print('unscoping all')
-            if len(self.default_command.split()) > 0:
                 value = self.default_command.split()[-1]
                 self.default_command = ' ' + ' '.join(self.default_command.split()[:-1])
 
@@ -498,8 +495,13 @@ class Shell(object):
                     self.default_command = self.default_command.strip()
                 set_scope(self.default_command, add=False)
                 print('unscoping: ' + value)
-            cmd = cmd.replace(SELECT_SYMBOL['unscope'], '')
+
+            else:
+                print("Scope must be a valid command")
+
+            cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
             continue_flag = True
+
         return continue_flag, cmd
 
     def cli_execute(self, cmd):
