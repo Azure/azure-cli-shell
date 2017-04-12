@@ -24,6 +24,9 @@
    $ pip install --user azure-cli-shell
 ```
 
+A list of common install issues for Azure CLI and their resolutions are available at [install troubleshooting](https://github.com/Azure/azure-cli/blob/master/doc/install_troubleshooting.md).
+
+
 ## Running
 
 To start the application
