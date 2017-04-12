@@ -463,8 +463,17 @@ class Shell(object):
     def handle_scoping_input(self, continue_flag, cmd, text):
         txtspt = text.split()
         default_split = text.partition(SELECT_SYMBOL['scope'])[2].split()
+        cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
+        continue_flag = True
 
         if SELECT_SYMBOL['scope'] == txtspt[0]:
+            if not default_split:
+                self.default_command = ""
+                set_scope("", add=False)
+                print('unscoping all')
+
+                return continue_flag, cmd
+
             while default_split:
                 if not text:
                     value = ''
@@ -476,12 +485,7 @@ class Shell(object):
                 else:
                     tree_val = value
 
-                if len(txtspt) == 1:
-                    self.default_command = ""
-                    set_scope("", add=False)
-                    print('unscoping all')
-
-                elif in_tree(self.completer.command_tree, tree_val.strip()):
+                if in_tree(self.completer.command_tree, tree_val.strip()):
                     self.set_scope(value)
                     print("defaulting: " + value)
                     cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
@@ -502,9 +506,6 @@ class Shell(object):
                     print("Scope must be a valid command")
 
                 default_split = default_split[1:]
-
-            cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
-            continue_flag = True
 
         return continue_flag, cmd
 
