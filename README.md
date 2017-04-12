@@ -24,7 +24,7 @@
    $ pip install --user azure-cli-shell
 ```
 
-A list of common install issues and their resolutions are available at [install troubleshooting](https://github.com/oakeyc/azure-cli-shell/blob/master/docs/install_troubleshooting.md).
+A list of common install issues and their resolutions are available at [install troubleshooting](https://github.com/oakeyc/azure-cli/blob/master/docs/install_troubleshooting.md).
 
 
 ## Running
