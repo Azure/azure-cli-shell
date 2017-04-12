@@ -26,6 +26,7 @@
 
 A list of common install issues for Azure CLI and their resolutions are available at [install troubleshooting](https://github.com/Azure/azure-cli/blob/master/doc/install_troubleshooting.md).
 
+A list of FAQ [FAQ](https://github.com/Azure/azure-cli/issues?q=label%3AFAQ)
 
 ## Running
 
