@@ -63,4 +63,8 @@ def parse_quotes(cmd, quotes=True):
             args.extend(words.split())
     else:
         args = words.split()
-    return args
+
+    str_args = []
+    for arg in args:
+        str_args.append(str(arg))
+    return str_args

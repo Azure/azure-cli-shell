@@ -12,6 +12,16 @@ import subprocess
 import sys
 
 import jmespath
+from six.moves import configparser
+
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.buffer import Buffer
+from prompt_toolkit.document import Document
+from prompt_toolkit.enums import DEFAULT_BUFFER
+from prompt_toolkit.filters import Always
+from prompt_toolkit.history import InMemoryHistory
+from prompt_toolkit.interface import CommandLineInterface, Application
+from prompt_toolkit.shortcuts import create_eventloop
 
 import azclishell.configuration
 from azclishell.az_lexer import AzLexer, ExampleLexer, ToolbarLexer
@@ -32,16 +42,6 @@ from azure.cli.core._session import ACCOUNT, CONFIG, SESSION
 from azure.cli.core._util import (show_version_info_exit, handle_exception)
 from azure.cli.core._util import CLIError
 
-from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
-from prompt_toolkit.buffer import Buffer
-from prompt_toolkit.document import Document
-from prompt_toolkit.enums import DEFAULT_BUFFER
-from prompt_toolkit.filters import Always
-from prompt_toolkit.history import InMemoryHistory
-from prompt_toolkit.interface import CommandLineInterface, Application
-from prompt_toolkit.shortcuts import create_eventloop
-
-from six.moves import configparser
 
 SHELL_CONFIGURATION = azclishell.configuration.CONFIGURATION
 SHELL_CONFIG_DIR = azclishell.configuration.get_config_dir
@@ -319,10 +319,13 @@ class Shell(object):
         except ValueError:
             print("An Integer should follow the colon")
             return ""
-        if cmd in self.completer.command_examples and num >= 0 and\
-           num < len(self.completer.command_examples[cmd]):
-            example = self.completer.command_examples[cmd][num][1]
-            example = example.replace('\n', '')
+        if cmd in self.completer.command_examples:
+            if num >= 0 and num < len(self.completer.command_examples[cmd]):
+                example = self.completer.command_examples[cmd][num][1]
+                example = example.replace('\n', '')
+            else:
+                print('Invalid example number')
+                return '', True
 
         example = example.replace('az', '')
 
@@ -366,7 +369,7 @@ class Shell(object):
                 example_cli.request_redraw()
                 answer = example_cli.run()
                 if not answer:
-                    return ""
+                    return "", True
                 answer = answer.text
                 if answer.strip('\n') == cmd.strip('\n'):
                     continue
@@ -392,7 +395,7 @@ class Shell(object):
         if self.default_command:
             cmd = self.default_command + " " + cmd
 
-        if text.strip() == "quit" or text.strip() == "exit":
+        if cmd.strip() == "quit" or cmd.strip() == "exit":
             break_flag = True
         elif text.strip() == "clear":  # clears the history, but only when you restart
             outside = True
@@ -428,7 +431,7 @@ class Shell(object):
                 cmd = "az " + cmd
 
             elif SELECT_SYMBOL['example'] in text:
-                cmd = self.handle_example(cmd, continue_flag)
+                cmd, continue_flag = self.handle_example(cmd, continue_flag)
                 telemetry.track_ssg('tutorial', text)
 
         continue_flag, cmd = self.handle_scoping_input(continue_flag, cmd, text)

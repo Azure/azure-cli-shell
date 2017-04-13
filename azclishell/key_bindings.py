@@ -5,13 +5,13 @@
 
 from __future__ import print_function
 
-import azclishell.configuration
-from azclishell.telemetry import TC as telemetry
-
 from prompt_toolkit import prompt
 from prompt_toolkit.filters import Filter
 from prompt_toolkit.keys import Keys
 from prompt_toolkit.key_binding.manager import KeyBindingManager
+
+import azclishell.configuration
+from azclishell.telemetry import TC as telemetry
 
 
 manager = KeyBindingManager(

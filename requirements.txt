@@ -7,3 +7,5 @@ pylint==1.5.4
 setuptools==30.4.0
 pytest>=3.0.6
 jmespath>=0.9.0
+flake8==3.3.0
+six==1.10.0

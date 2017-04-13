@@ -114,6 +114,43 @@ class CompletionTest(unittest.TestCase):
         )
         self.completer = AzCompleter(commands, global_params=False)
 
+    def init4(self):
+        """ a variation of initializing """
+        com_tree1 = tree.generate_tree("createmore can")
+        com_tree2 = tree.generate_tree("create")
+        com_tree3 = tree.CommandHead()
+        com_tree3.add_child(com_tree2)
+        com_tree3.add_child(com_tree1)
+        command_param = {
+            "create" : ["--funtimes", "-f", "--helloworld"],
+        }
+        completable_param = [
+            "--helloworld",
+            "--funtimes",
+            "-f"
+        ]
+        param_descript = {
+            "create -f" : "There is no work life balance, it's just your life",
+            "create --funtimes" : "There is no work life balance, it's just your life"
+        }
+        same_param_doubles = {
+            "-f" : "--funtimes",
+            "--funtimes" : '-f'
+        }
+        command_description = {
+            "create" : '',
+            "createmore can" : ''
+        }
+        commands = _Commands(
+            command_tree=com_tree3,
+            command_param=command_param,
+            completable_param=completable_param,
+            param_descript=param_descript,
+            same_param_doubles=same_param_doubles,
+            descrip=command_description
+        )
+        self.completer = AzCompleter(commands, global_params=False)
+
     def test_command_completion(self):
         """ tests general command completion """
         self.init1()
@@ -183,11 +220,18 @@ class CompletionTest(unittest.TestCase):
         gen = self.completer.get_completions(doc, None)
         with self.assertRaises(StopIteration):
             six.next(gen)
-
         doc = Document(u'create --funtimes "life" --hello')
         gen = self.completer.get_completions(doc, None)
         self.assertEqual(six.next(gen), Completion(
             "--helloworld", -7))
+
+    def test_substring_completion(self):
+        self.init4()
+        doc = Document(u'create')
+        gen = self.completer.get_completions(doc, None)
+        self.assertEqual(six.next(gen), Completion(
+            "createmore", -6))
+
 
 if __name__ == '__main__':
     unittest.main()
