@@ -492,7 +492,7 @@ class Shell(object):
                     telemetry.track_ssg('scope command', value)
 
                 elif SELECT_SYMBOL['unscope'] == default_split[0] and \
-                     len(self.default_command.split()) > 0:
+                        len(self.default_command.split()) > 0:
 
                     value = self.default_command.split()[-1]
                     self.default_command = ' ' + ' '.join(self.default_command.split()[:-1])
