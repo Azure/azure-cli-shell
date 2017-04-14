@@ -28,7 +28,7 @@ class AzLexer(RegexLexer):
                 suffix=r'\b'),
              Keyword.Declaration),  # all other commands
             (words(
-                tuple(param for param in commands.completable_param),
+                tuple(param for param in commands.completable_param + commands.global_param),
                 prefix=r'',
                 suffix=r'\b'),
              Name.Class),  # parameters
