@@ -244,6 +244,9 @@ class AzCompleter(Completer):
             if self.branch.children is not None:
                 for com in self.branch.children:
                     yield Completion(com.data)
+            else:
+                for param in self.command_parameters[self.curr_command]:
+                    yield param
 
         # if space show current level commands
         elif len(text.split()) > 0 and text[-1].isspace() and self._is_command:
