@@ -244,16 +244,17 @@ class AzCompleter(Completer):
             if self.branch.children is not None:
                 for com in self.branch.children:
                     yield Completion(com.data)
-            else:
-                print('end')
-                for param in self.command_parameters[self.curr_command.strip()]:
-                    yield Completion(param)
 
         # if space show current level commands
         elif len(text.split()) > 0 and text[-1].isspace() and self._is_command:
             if self.branch is not self.command_tree:
                 for com in self.branch.children:
                     yield Completion(com.data)
+
+    def yield_param_completion(self, param, last_word):
+        """ yields a parameter """
+        return Completion(param, -len(last_word), display_meta=self.get_param_description(
+            self.curr_command + " " + str(param)).replace('\n', ''))
 
     def gen_cmd_and_param_completions(self, text):
         """ generates command and parameter completions """
@@ -268,18 +269,10 @@ class AzCompleter(Completer):
             elif self._is_command:
                 temp_command += ' ' + str(word) if temp_command else str(word)
 
+            mid_val = text.find(word) + len(word)
             # moving down command tree
-            if self.branch.has_child(word):
-                mid_val = text.find(word) + len(word)
-                # print(text[mid_val])
-                if len(text) > mid_val and text[mid_val].isspace():
-                    # print('first')
-                    self.branch = self.branch.get_child(word, self.branch.children)
-                    # last_branch = word
-                # elif last_branch and text[text.find(last_branch) - 1].isspace():
-                #     print('second')
-                #     self.branch = self.branch.get_child(word, self.branch.children)
-                #     last_branch = word
+            if self.branch.has_child(word) and len(text) > mid_val and text[mid_val].isspace():
+                self.branch = self.branch.get_child(word, self.branch.children)
 
         if len(text) > 0 and text[-1].isspace():
             if in_tree(self.command_tree, temp_command):
@@ -297,26 +290,25 @@ class AzCompleter(Completer):
                 for param in self.command_parameters[self.curr_command]:
                     if self.validate_completion(param, last_word, text) and\
                             not param.startswith("--"):
-                        yield Completion(
-                            param, -len(last_word),
-                            display_meta=self.get_param_description(
-                                self.curr_command + " " + str(param)).replace('\n', ''))
+                        yield self.yield_param_completion(param, last_word)
+
         elif last_word.startswith("--"):  # for regular parameters
             self._is_command = False
 
             if self.has_parameters(self.curr_command):  # Everything should, map to empty list
                 for param in self.command_parameters[self.curr_command]:
                     if self.validate_completion(param, last_word, text):
-                        yield Completion(
-                            param, -len(last_word),
-                            display_meta=self.get_param_description(
-                                self.curr_command + " " + str(param)).replace('\n', ''))
+                        yield self.yield_param_completion(param, last_word)
 
-        if self.branch.children is not None and self._is_command:  # all underneath commands
+        if self.branch.children and self._is_command:  # all underneath commands
             for kid in self.branch.children:
                 if self.validate_completion(kid.data, txtspt[-1], text, False):
                     yield Completion(
                         str(kid.data), -len(txtspt[-1]))
+        elif self._is_command:
+            for param in self.command_parameters[self.curr_command.strip()]:
+                if param.startswith('--'):
+                    yield self.yield_param_completion(param, '')
 
     def gen_global_param_completions(self, text):
         """ Global parameter stuff hard-coded in """
