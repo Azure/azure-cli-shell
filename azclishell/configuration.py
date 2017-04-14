@@ -17,7 +17,7 @@ SELECT_SYMBOL = {
     'example' : '::',
     'exit_code' : '$',
     'scope' : '%%',
-    'unscope' : '^^'
+    'unscope' : '..'
 }
 
 GESTURE_INFO = {
@@ -26,7 +26,7 @@ GESTURE_INFO = {
     "[cmd] " + SELECT_SYMBOL['example'] + " [num]" : "do a step by step tutorial of example",
     SELECT_SYMBOL['exit_code'] : "get the exit code of the previous command",
     SELECT_SYMBOL['scope'] + '[cmd]' : "set a scope",
-    SELECT_SYMBOL['unscope'] : "unset a scope",
+    SELECT_SYMBOL['scope'] + ' ' + SELECT_SYMBOL['unscope'] : "go back a scope",
     "Crtl+N" : "Scroll down the documentation",
     "Crtl+Y" : "Scroll up the documentation"
 }
