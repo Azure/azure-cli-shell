@@ -259,6 +259,7 @@ class AzCompleter(Completer):
         """ generates command and parameter completions """
         temp_command = str('')
         txtspt = text.split()
+
         for word in txtspt:
             if word.startswith("-"):
                 self._is_command = False
@@ -267,8 +268,18 @@ class AzCompleter(Completer):
             elif self._is_command:
                 temp_command += ' ' + str(word) if temp_command else str(word)
 
-            if self.branch.has_child(word) and text[-1].isspace():  # moving down command tree
-                self.branch = self.branch.get_child(word, self.branch.children)
+            # moving down command tree
+            if self.branch.has_child(word):
+                mid_val = text.find(word) + len(word)
+                # print(text[mid_val])
+                if len(text) > mid_val and text[mid_val].isspace():
+                    # print('first')
+                    self.branch = self.branch.get_child(word, self.branch.children)
+                    # last_branch = word
+                # elif last_branch and text[text.find(last_branch) - 1].isspace():
+                #     print('second')
+                #     self.branch = self.branch.get_child(word, self.branch.children)
+                #     last_branch = word
 
         if len(text) > 0 and text[-1].isspace():
             if in_tree(self.command_tree, temp_command):
