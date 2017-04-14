@@ -77,6 +77,7 @@ def space_examples(list_examples, rows):
 
     if num_newline > rows * PART_SCREEN_EXAMPLE:
         len_of_excerpt = math.floor(float(rows) * PART_SCREEN_EXAMPLE)
+
         group = example.split('\n')
         end = int(get_section() * len_of_excerpt)
         begin = int((get_section() - 1) * len_of_excerpt)
@@ -88,7 +89,7 @@ def space_examples(list_examples, rows):
             while ((get_section() - 1) * len_of_excerpt) > num_newline:
                 sub_section()
 
-    return example
+    return example + '\n' + str(get_section()) + "/" + str(math.ceil(num_newline / len_of_excerpt))
 
 
 def _toolbar_info():
