@@ -81,7 +81,15 @@ def gen_dyn_completion(comp, started_param, prefix, text):
 
 def sort_completions(gen):
     """ sorts the completions """
-    return sorted(list(gen), key=lambda a: a.text)
+
+    def _get_weight(val):
+        """ weights the completions with required things first the lexicographically"""
+        priority = ''
+        if val.display_meta and val.display_meta.startswith('[REQUIRED]'):
+            priority = ' '  # a space has the lowest ordinance
+        return priority + val.text
+
+    return sorted(list(gen), key=_get_weight)
 
 
 # pylint: disable=too-many-instance-attributes
@@ -255,7 +263,7 @@ class AzCompleter(Completer):
             elif self._is_command:
                 temp_command += ' ' + str(word) if temp_command else str(word)
 
-            if self.branch.has_child(word):  # moving down command tree
+            if self.branch.has_child(word) and text[-1].isspace():  # moving down command tree
                 self.branch = self.branch.get_child(word, self.branch.children)
 
         if len(text) > 0 and text[-1].isspace():
