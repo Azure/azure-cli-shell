@@ -27,8 +27,8 @@ GESTURE_INFO = {
     SELECT_SYMBOL['exit_code'] : "get the exit code of the previous command",
     SELECT_SYMBOL['scope'] + '[cmd]' : "set a scope",
     SELECT_SYMBOL['scope'] + ' ' + SELECT_SYMBOL['unscope'] : "go back a scope",
-    "Crtl+N" : "Scroll down the documentation",
-    "Crtl+Y" : "Scroll up the documentation"
+    "Ctrl+N" : "Scroll down the documentation",
+    "Ctrl+Y" : "Scroll up the documentation"
 }
 
 CONFIG_FILE_NAME = 'shell-config'
