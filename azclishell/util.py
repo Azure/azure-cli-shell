@@ -19,7 +19,7 @@ def get_window_dim():
 
     if version >= (3, 3):
         return _size_36()
-    elif  platform.system() == 'Windows':
+    elif platform.system() == 'Windows':
         return _size_windows()
     else:
         return _size_27()
@@ -39,6 +39,7 @@ def _size_36():
         return dim[0], dim[1]
     return dim.lines, dim.columns
 
+
 def _size_windows():
     from ctypes import windll, create_string_buffer
     # stdin handle is -10
@@ -54,6 +55,7 @@ def _size_windows():
         sizex = right - left + 1
         sizey = bottom - top + 1
         return sizex, sizey
+
 
 def default_style():
     """ Default coloring """
