@@ -49,9 +49,7 @@ def _size_windows():
     csbi = create_string_buffer(22)
     res = windll.kernel32.GetConsoleScreenBufferInfo(h, csbi)
     if res:
-        (bufx, bufy, curx, cury, wattr,
-            left, top, right, bottom,
-            maxx, maxy) = struct.unpack("hhhhHhhhhhh", csbi.raw)
+        (_, _, _, _, _, left, top, right, bottom, _, _) = struct.unpack("hhhhHhhhhhh", csbi.raw)
         sizex = right - left + 1
         sizey = bottom - top + 1
         return sizex, sizey
