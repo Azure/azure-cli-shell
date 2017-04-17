@@ -6,6 +6,7 @@
 
 import os
 import sys
+import struct
 import platform
 
 from prompt_toolkit.styles import style_from_dict
@@ -16,8 +17,10 @@ def get_window_dim():
     """ gets the dimensions depending on python version and os"""
     version = sys.version_info
 
-    if platform.system() == 'Windows' or version >= (3, 3):
-        return _size_36_windows()
+    if version >= (3, 3):
+        return _size_36()
+    elif  platform.system() == 'Windows':
+        return _size_windows()
     else:
         return _size_27()
 
@@ -28,7 +31,7 @@ def _size_27():
     return dim[0], dim[1]
 
 
-def _size_36_windows():
+def _size_36():
     """ returns the rows, columns of terminal """
     from shutil import get_terminal_size  # pylint: disable=no-name-in-module
     dim = get_terminal_size()
@@ -36,6 +39,21 @@ def _size_36_windows():
         return dim[0], dim[1]
     return dim.lines, dim.columns
 
+def _size_windows():
+    from ctypes import windll, create_string_buffer
+    # stdin handle is -10
+    # stdout handle is -11
+    # stderr handle is -12
+    h = windll.kernel32.GetStdHandle(-12)
+    csbi = create_string_buffer(22)
+    res = windll.kernel32.GetConsoleScreenBufferInfo(h, csbi)
+    if res:
+        (bufx, bufy, curx, cury, wattr,
+            left, top, right, bottom,
+            maxx, maxy) = struct.unpack("hhhhHhhhhhh", csbi.raw)
+        sizex = right - left + 1
+        sizey = bottom - top + 1
+        return sizex, sizey
 
 def default_style():
     """ Default coloring """
@@ -119,8 +137,4 @@ def parse_quotes(cmd, quotes=True):
             args.extend(words.split())
     else:
         args = words.split()
-
-    str_args = []
-    for arg in args:
-        str_args.append(str(arg))
-    return str_args
+    return args
