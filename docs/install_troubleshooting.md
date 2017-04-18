@@ -144,3 +144,9 @@ Ubuntu 15 may require `build-essential` also:
 ```
 
 See Stack Overflow question - [Failed to install Python Cryptography package with PIP and setup.py](http://stackoverflow.com/questions/22073516/failed-to-install-python-cryptography-package-with-pip-and-setup-py)
+
+
+Missing shell command
+---------------------
+
+If your shell is unable to find the command `az-shell` you likely installed the shell via `pip install azure-cli-shell`. Please run `pip install azure-cli-shell --user`.
