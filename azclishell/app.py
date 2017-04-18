@@ -581,6 +581,7 @@ class Shell(object):
                     else:
                         self.cli_execute(cmd)
             except KeyboardInterrupt:  # CTRL C
+                self.set_prompt()
                 continue
 
         print('Have a lovely day!!')
