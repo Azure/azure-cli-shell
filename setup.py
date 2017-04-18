@@ -20,7 +20,7 @@ with open('README.rst', 'r', encoding='utf-8') as f:
 with open('HISTORY.rst', 'r', encoding='utf-8') as f:
     HISTORY = f.read()
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 setup(
     name='azure-cli-shell',
