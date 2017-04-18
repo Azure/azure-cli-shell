@@ -414,7 +414,7 @@ class Shell(object):
             if text[0] == SELECT_SYMBOL['outside']:
                 cmd = text[1:]
                 outside = True
-                if cmd.split()[0] == 'cd':
+                if cmd.strip() and cmd.split()[0] == 'cd':
                     handle_cd(parse_quotes(cmd))
                     continue_flag = True
                 telemetry.track_ssg('outside', cmd)
