@@ -20,7 +20,10 @@ class _Commands():
     command_example=None, same_param_doubles=None):
         self.descrip = descrip
         self.completable = completable
-        self.command_param = command_param
+        com_par = {}
+        for com in self.descrip.keys():
+            com_par[com] = ''
+        self.command_param = command_param or com_par
         self.completable_param = completable_param
 
         self.command_tree = command_tree
