@@ -2,6 +2,12 @@
 
 Release History
 ===============
+0.2.1
+++++++++++++++++++
+
+* CLI Performance changes integrated
+
+
 0.2.0
 ++++++++++++++++++
 
