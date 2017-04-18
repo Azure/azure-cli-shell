@@ -18,7 +18,7 @@ from azclishell.gather_commands import GatherCommands
 from azclishell.app import Shell
 from azclishell.az_completer import AzCompleter
 from azclishell.az_lexer import AzLexer
-from azclishell.util import default_style
+from azclishell.color_styles import style_factory, get_options
 
 from azure.cli.core.application import APPLICATION
 from azure.cli.core._session import ACCOUNT, CONFIG, SESSION
@@ -34,12 +34,9 @@ def main(args):
 
     parser = argparse.ArgumentParser(prog='az-shell')
     parser.add_argument(
-        '--no-style', dest='style', action='store_true', help='the colors of the shell')
+        '--style', dest='style', help='the colors of the shell',
+        choices=get_options())
     args = parser.parse_args(args)
-
-    style = default_style()
-    if args.style:
-        style = None
 
     azure_folder = cli_config_dir()
     if not os.path.exists(azure_folder):
@@ -51,6 +48,14 @@ def main(args):
 
     config = SHELL_CONFIGURATION
     shell_config_dir = azclishell.configuration.get_config_dir
+
+    if args.style:
+        given_style = args.style
+        config.set_style(given_style)
+    else:
+        given_style = config.get_style()
+
+    style = style_factory(given_style)
 
     if config.BOOLEAN_STATES[config.config.get('DEFAULT', 'firsttime')]:
         print("When in doubt, ask for 'help'")

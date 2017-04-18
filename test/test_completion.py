@@ -223,6 +223,10 @@ class CompletionTest(unittest.TestCase):
         gen = self.completer.get_completions(doc, None)
         with self.assertRaises(StopIteration):
             six.next(gen)
+        doc = Document(u'create --funtimes "life" --hello')
+        gen = self.completer.get_completions(doc, None)
+        self.assertEqual(six.next(gen), Completion(
+            "--helloworld", -7))
 
     def test_substring_completion(self):
         self.init4()
