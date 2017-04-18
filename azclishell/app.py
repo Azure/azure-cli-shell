@@ -108,7 +108,7 @@ def _toolbar_info():
         " [F1]Layout",
         "[F2]Defaults",
         "[F3]Keys",
-        "[Crtl+D]Quit",
+        "[Ctrl+D]Quit",
         tool_val
     ]
     return settings_items
