@@ -14,7 +14,7 @@ from azclishell.layout import get_scope
 from azclishell.util import parse_quotes
 
 from azure.cli.core.parser import AzCliCommandParser
-from azure.cli.core._util import CLIError
+from azure.cli.core.util import CLIError
 
 SELECT_SYMBOL = azclishell.configuration.SELECT_SYMBOL
 

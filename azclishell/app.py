@@ -39,8 +39,8 @@ from azure.cli.core._config import az_config, DEFAULTS_SECTION
 from azure.cli.core._environment import get_config_dir
 from azure.cli.core._profile import _SUBSCRIPTION_NAME, Profile
 from azure.cli.core._session import ACCOUNT, CONFIG, SESSION
-from azure.cli.core._util import (show_version_info_exit, handle_exception)
-from azure.cli.core._util import CLIError
+from azure.cli.core.util import (show_version_info_exit, handle_exception)
+from azure.cli.core.util import CLIError
 
 
 SHELL_CONFIGURATION = azclishell.configuration.CONFIGURATION
@@ -522,7 +522,7 @@ class Shell(object):
             CONFIG.load(os.path.join(azure_folder, 'az.json'))
             SESSION.load(os.path.join(azure_folder, 'az.sess'), max_age=3600)
 
-            config = Configuration(args)
+            config = Configuration()
             self.app.initialize(config)
 
             result = self.app.execute(args)
