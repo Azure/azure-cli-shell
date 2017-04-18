@@ -245,7 +245,7 @@ OPTIONS = {
 
 def style_factory(style):
     """ returns the proper style """
-    return OPTIONS[style]() if style in OPTIONS else default_style()
+    return OPTIONS.get(style, default_style())
 
 
 def get_options():
