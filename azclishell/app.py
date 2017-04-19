@@ -392,6 +392,7 @@ class Shell(object):
     def _special_cases(self, text, cmd, outside):
         break_flag = False
         continue_flag = False
+
         if text and text.split()[0].lower() == 'az':
             telemetry.track_ssg('az', text)
             cmd = ' '.join(text.split()[1:])
@@ -509,7 +510,8 @@ class Shell(object):
                     print("Scope must be a valid command")
 
                 default_split = default_split[1:]
-
+        else:
+            return False, cmd
         return continue_flag, cmd
 
     def cli_execute(self, cmd):
@@ -526,7 +528,6 @@ class Shell(object):
 
             config = Configuration()
             self.app.initialize(config)
-
             result = self.app.execute(args)
             self.last_exit = 0
             if result and result.result is not None:
@@ -562,10 +563,12 @@ class Shell(object):
                         continue
                     cmd = text
                     outside = False
+
                 except AttributeError:  # when the user pressed Control D
                     break
                 else:
                     b_flag, c_flag, outside, cmd = self._special_cases(text, cmd, outside)
+
                     if b_flag:
                         break
                     if c_flag:
@@ -576,6 +579,7 @@ class Shell(object):
                         self.history.append(text)
 
                     self.set_prompt()
+
                     if outside:
                         subprocess.Popen(cmd, shell=True).communicate()
                     else:

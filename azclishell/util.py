@@ -6,6 +6,7 @@
 
 import os
 import sys
+import struct
 import platform
 
 
@@ -13,8 +14,10 @@ def get_window_dim():
     """ gets the dimensions depending on python version and os"""
     version = sys.version_info
 
-    if platform.system() == 'Windows' or version >= (3, 3):
-        return _size_36_windows()
+    if version >= (3, 3):
+        return _size_36()
+    elif platform.system() == 'Windows':
+        return _size_windows()
     else:
         return _size_27()
 
@@ -25,13 +28,81 @@ def _size_27():
     return dim[0], dim[1]
 
 
-def _size_36_windows():
+def _size_36():
     """ returns the rows, columns of terminal """
     from shutil import get_terminal_size  # pylint: disable=no-name-in-module
     dim = get_terminal_size()
     if isinstance(dim, list):
         return dim[0], dim[1]
     return dim.lines, dim.columns
+
+
+def _size_windows():
+    from ctypes import windll, create_string_buffer
+    # stdin handle is -10
+    # stdout handle is -11
+    # stderr handle is -12
+    h = windll.kernel32.GetStdHandle(-12)
+    csbi = create_string_buffer(22)
+    res = windll.kernel32.GetConsoleScreenBufferInfo(h, csbi)
+    if res:
+        (_, _, _, _, _, left, top, right, bottom, _, _) = struct.unpack("hhhhHhhhhhh", csbi.raw)
+        columns = right - left + 1
+        lines = bottom - top + 1
+        return lines, columns
+
+
+def default_style():
+    """ Default coloring """
+    if platform.system() == 'Windows':
+        styles = style_from_dict({
+            # Completion colors
+            Token.Menu.Completions.Completion.Current: 'bg:#7c2c80 #ffffff',
+            Token.Menu.Completions.Completion: 'bg:#00b7b7 #ffffff',
+            Token.Menu.Completions.ProgressButton: 'bg:#b78991',
+            Token.Menu.Completions.ProgressBar: 'bg:#ffc0cb',
+
+            Token.Az: '#7c2c80',
+            Token.Prompt.Arg: '#888888',
+
+            # Pretty Words
+            Token.Keyword: '#965699',
+            Token.Keyword.Declaration: '#ab77ad',
+            Token.Name.Class: '#c49fc5',
+            Token.Text: '#0f5050',
+
+            Token.Line: '#E500E5',
+            Token.Number: '#00ffff',
+            # toolbar
+            Token.Operator: 'bg:#000000 #ffffff',
+            Token.Toolbar: 'bg:#000000 #ffffff'
+        })
+
+    else:
+        styles = style_from_dict({
+            # Completion colors
+            Token.Menu.Completions.Completion.Current: 'bg:#7c2c80 #ffffff',
+            Token.Menu.Completions.Completion: 'bg:#00b7b7 #ffffff',
+            Token.Menu.Completions.ProgressButton: 'bg:#b78991',
+            Token.Menu.Completions.ProgressBar: 'bg:#ffc0cb',
+
+            Token.Az: '#7c2c80',
+            Token.Prompt.Arg: '#888888',
+
+            # Pretty Words
+            Token.Keyword: '#965699',
+            Token.Keyword.Declaration: '#ab77ad',
+            Token.Name.Class: '#c49fc5',
+            Token.Text: '#666666',
+
+            Token.Line: '#E500E5',
+            Token.Number: '#3d79db',
+            # toolbar
+            Token.Operator: 'bg:#000000 #ffffff',
+            Token.Toolbar: 'bg:#000000 #ffffff'
+        })
+
+    return styles
 
 
 def parse_quotes(cmd, quotes=True):
