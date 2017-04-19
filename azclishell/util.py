@@ -50,9 +50,9 @@ def _size_windows():
     res = windll.kernel32.GetConsoleScreenBufferInfo(h, csbi)
     if res:
         (_, _, _, _, _, left, top, right, bottom, _, _) = struct.unpack("hhhhHhhhhhh", csbi.raw)
-        sizex = right - left + 1
-        sizey = bottom - top + 1
-        return sizex, sizey
+        columns = right - left + 1
+        lines = bottom - top + 1
+        return lines, columns
 
 
 def default_style():
