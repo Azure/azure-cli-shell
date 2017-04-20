@@ -41,6 +41,9 @@ https://github.com/Azure/msrest-for-python/blob/master/msrest/pipeline.py
 In the CLI:
 - there is a LongRunning Operation class that poles the server to get some information
     - exactly what information I can abstract I still don't know
+    - it seems like I get suceess or failure, so spinning wheel might be it?
+        - I can get the 'status,' but I'm not sure exactly what a status value would look like?
+                ASK SOMEONE WHAT THE STATUS VALUE LOOKS LIKE
 
 Long Running:
 - If all I can get is that it's not done:
