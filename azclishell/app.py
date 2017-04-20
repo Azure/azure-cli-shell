@@ -419,10 +419,7 @@ class Shell(object):
                 telemetry.track_ssg('outside', cmd)
 
             elif text[0] == SELECT_SYMBOL['exit_code']:
-                if self.last_exit == 0:
-                    meaning = 'Success'
-                else:
-                    meaning = 'Failure'
+                meaning = "Success" if self.last_exit == 0 else "Failure"
 
                 print(meaning + ": " + str(self.last_exit))
                 continue_flag = True
