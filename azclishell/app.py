@@ -465,12 +465,11 @@ class Shell(object):
         return continue_flag
 
     def handle_scoping_input(self, continue_flag, cmd, text):
-        txtspt = text.split()
         default_split = text.partition(SELECT_SYMBOL['scope'])[2].split()
         cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
         continue_flag = True
 
-        if SELECT_SYMBOL['scope'] == txtspt[0]:
+        if text and SELECT_SYMBOL['scope'] == text[0:2]:
             if not default_split:
                 self.default_command = ""
                 set_scope("", add=False)
