@@ -467,9 +467,10 @@ class Shell(object):
     def handle_scoping_input(self, continue_flag, cmd, text):
         default_split = text.partition(SELECT_SYMBOL['scope'])[2].split()
         cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
-        continue_flag = True
 
         if text and SELECT_SYMBOL['scope'] == text[0:2]:
+            continue_flag = True
+
             if not default_split:
                 self.default_command = ""
                 set_scope("", add=False)
@@ -510,7 +511,7 @@ class Shell(object):
 
                 default_split = default_split[1:]
         else:
-            return False, cmd
+            return continue_flag, cmd
         return continue_flag, cmd
 
     def cli_execute(self, cmd):
