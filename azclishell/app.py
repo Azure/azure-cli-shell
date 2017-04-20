@@ -468,7 +468,7 @@ class Shell(object):
         default_split = text.partition(SELECT_SYMBOL['scope'])[2].split()
         cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
 
-        if SELECT_SYMBOL['scope'] == txtspt[0]:
+        if text and SELECT_SYMBOL['scope'] == text[0:2]:
             continue_flag = True
 
             if not default_split:
