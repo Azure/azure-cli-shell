@@ -43,9 +43,8 @@ def reformat_cmd(text):
     """ reformat the text to be stripped of noise """
     # remove az if there
     text = text.replace('az', '')
-    txtsplt = text.split()
     # disregard defaulting symbols
-    if text and text[-1].isspace() and txtsplt and SELECT_SYMBOL['scope'] == txtsplt[0]:
+    if text and SELECT_SYMBOL['scope'] == text[0:2]:
         text = text.replace(SELECT_SYMBOL['scope'], "")
 
     if get_scope():
