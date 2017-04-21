@@ -44,6 +44,8 @@ In the CLI:
     - it seems like I get suceess or failure, so spinning wheel might be it?
         - I can get the 'status,' but I'm not sure exactly what a status value would look like?
                 ASK SOMEONE WHAT THE STATUS VALUE LOOKS LIKE
+- storage get a percentage of upload/download
+
 
 Long Running:
 - If all I can get is that it's not done:
