@@ -108,7 +108,7 @@ class Configuration(object):
 
     def has_feedback(self):
         """ returns whether user has given feedback """
-        return self.config.get('DEFAULT', 'given feedback')
+        return self.BOOLEAN_STATES[self.config.get('DEFAULT', 'given feedback')]
 
     def set_feedback(self, value):
         """ sets the feedback in the config """

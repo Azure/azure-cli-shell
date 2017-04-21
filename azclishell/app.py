@@ -522,7 +522,7 @@ class Shell(object):
             args = parse_quotes(cmd)
             azlogging.configure_logging(args)
 
-            if args == 'feedback':
+            if 'feedback' in args:
                 SHELL_CONFIGURATION.set_feedback('yes')
 
             azure_folder = get_config_dir()
