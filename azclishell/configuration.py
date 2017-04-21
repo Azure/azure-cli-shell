@@ -65,6 +65,7 @@ class Configuration(object):
         self.config.add_section('Layout')
         self.config.set('Help Files', 'command', 'help_dump.json')
         self.config.set('Help Files', 'history', 'history.txt')
+        self.config.set('Help Files', 'frequency', 'frequency.json')
         self.config.set('Layout', 'command_description', 'yes')
         self.config.set('Layout', 'param_description', 'yes')
         self.config.set('Layout', 'examples', 'yes')
@@ -87,6 +88,10 @@ class Configuration(object):
     def get_help_files(self):
         """ returns where the command table is cached """
         return self.config.get('Help Files', 'command')
+
+    def get_frequency(self):
+        """ returns the name of the frequency file """
+        return self.config.get('Help Files', 'frequency')
 
     def load(self, path):
         """ loads the configuration settings """
