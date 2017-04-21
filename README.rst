@@ -58,14 +58,14 @@ To only see the commands for a command
 
 .. code-block:: console
 
-   $ %% [top-level command]
-
+   $ %% [top-level command] [sub-level command] etc
+ 
 
 To undefault a value
 
 .. code-block:: console
 
-   $ ^^ [value to undefault]
+   $ %% ..
 
 
 Use Examples

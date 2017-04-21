@@ -424,7 +424,9 @@ class Shell(object):
                 telemetry.track_ssg('outside', cmd)
 
             elif text[0] == SELECT_SYMBOL['exit_code']:
-                print(self.last_exit)
+                meaning = "Success" if self.last_exit == 0 else "Failure"
+
+                print(meaning + ": " + str(self.last_exit))
                 continue_flag = True
                 telemetry.track_ssg('exit code', cmd)
 
@@ -468,9 +470,10 @@ class Shell(object):
     def handle_scoping_input(self, continue_flag, cmd, text):
         default_split = text.partition(SELECT_SYMBOL['scope'])[2].split()
         cmd = cmd.replace(SELECT_SYMBOL['scope'], '')
-        continue_flag = True
 
         if text and SELECT_SYMBOL['scope'] == text[0:2]:
+            continue_flag = True
+
             if not default_split:
                 self.default_command = ""
                 set_scope("", add=False)
@@ -511,7 +514,7 @@ class Shell(object):
 
                 default_split = default_split[1:]
         else:
-            return False, cmd
+            return continue_flag, cmd
         return continue_flag, cmd
 
     def cli_execute(self, cmd):
