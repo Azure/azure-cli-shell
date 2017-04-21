@@ -11,19 +11,45 @@ from azclishell.configuration import CONFIGURATION, get_config_dir
 
 SHELL_CONFIG = CONFIGURATION
 
-with open(os.path.join(get_config_dir(), SHELL_CONFIG.get_frequency()), 'r') as freq:
-    try:
-        frequency = json.load(freq)
-    except ValueError:
-        frequency = {}
+
+def today_format(now):
+    """ returns the date format """
+    return now.strftime("%Y-%m-%d")
 
 
-with open(os.path.join(get_config_dir(), SHELL_CONFIG.get_frequency()), 'w') as freq:
-    now = datetime.datetime.now()
-    now = now.strftime("%Y-%m-%d")
-    val = frequency.get(now)
-    frequency[now] = val + 1 if val else 1
-    json.dump(frequency, freq)
+def update_frequency():
+    """ updates the frequency from files """
+    with open(os.path.join(get_config_dir(), SHELL_CONFIG.get_frequency()), 'r') as freq:
+        try:
+            frequency = json.load(freq)
+        except ValueError:
+            frequency = {}
 
 
-frequent_user = True
+    with open(os.path.join(get_config_dir(), SHELL_CONFIG.get_frequency()), 'w') as freq:
+        now = datetime.datetime.now()
+        now = today_format(now)
+        val = frequency.get(now)
+        frequency[now] = val + 1 if val else 1
+        json.dump(frequency, freq)
+
+    return frequency
+
+
+def frequency_measurement():
+    """ measures how many times a user has used this program in the last calendar week """
+    freq = update_frequency()
+    count = 0
+    base = datetime.datetime.now()
+    date_list = [base - datetime.timedelta(days=x) for x in range(1, 7)]
+    for day in date_list:
+        count += freq.get(today_format(day), 0)
+    return count
+
+
+def frequency_heuristic():
+    """ decides whether user meets requirements for frequency """
+    return frequency_measurement() > 4
+
+
+frequent_user = frequency_heuristic()
