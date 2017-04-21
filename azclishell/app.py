@@ -34,6 +34,7 @@ from azclishell.util import get_window_dim, parse_quotes
 
 import azure.cli.core.azlogging as azlogging
 from azure.cli.core.application import Configuration
+from azure.cli.core.commands import LongRunningOperation
 from azure.cli.core.cloud import get_active_cloud_name
 from azure.cli.core._config import az_config, DEFAULTS_SECTION
 from azure.cli.core._environment import get_config_dir
@@ -514,6 +515,7 @@ class Shell(object):
         return continue_flag, cmd
 
     def cli_execute(self, cmd):
+        """ sends the command to the CLI to be executed """
         try:
             args = parse_quotes(cmd)
             azlogging.configure_logging(args)
