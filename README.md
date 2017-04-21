@@ -55,13 +55,13 @@ jmespath format for querying
 To only see the commands for a command
 
 ```bash
-   $ %% [top-level command]
+   $ %% [top-level command] [sub-level command] etc
 ```
 
 To undefault a value
 
 ```bash
-   $ ^^ [value to undefault]
+   $ %% ..
 ```
 
 ## Use Examples
