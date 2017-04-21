@@ -61,6 +61,11 @@ def main(args):
         print("When in doubt, ask for 'help'")
         config.firsttime()
 
+    frequent_user = True
+    if not config.has_feedback() and frequent_user:
+        print("Please send us your feedback with the 'feedback' command." +
+              " We would greatly appreciate it.")
+
     shell_app = Shell(
         completer=AZCOMPLETER,
         lexer=AzLexer,
