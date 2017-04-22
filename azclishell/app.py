@@ -10,6 +10,7 @@ import math
 import os
 import subprocess
 import sys
+import threading
 
 import jmespath
 from six.moves import configparser
@@ -34,7 +35,7 @@ from azclishell.util import get_window_dim, parse_quotes
 
 import azure.cli.core.azlogging as azlogging
 from azure.cli.core.application import Configuration
-from azure.cli.core.commands import LongRunningOperation
+from azure.cli.core.commands import LongRunningOperation, get_op_handler, get_status
 from azure.cli.core.cloud import get_active_cloud_name
 from azure.cli.core._config import az_config, DEFAULTS_SECTION
 from azure.cli.core._environment import get_config_dir
@@ -157,6 +158,7 @@ class Shell(object):
         self.output = output_custom
         self.config_default = ""
         self.default_command = ""
+        self.threads = []
 
     @property
     def cli(self):
@@ -517,6 +519,33 @@ class Shell(object):
             return continue_flag, cmd
         return continue_flag, cmd
 
+    def handle_long_process(self, args):
+        """ makes changes to indicates long running process """
+        print('pass')
+        """ in LongRUnningOperation there is the call method which could be usefull """
+
+        # client = None
+        # try:
+        #     op = get_op_handler('azure.cli.command_modules.vm.custom#create_vm')
+        #     try:
+        #         result = op(client, **kwargs) if client else op(**kwargs)
+        #     except Exception as ex:  # pylint: disable=broad-except
+        #             raise ex
+
+        #     # # apply results transform if specified
+        #     # if transform_result:
+        #     #     return transform_result(result)
+
+        #     # otherwise handle based on return type of results
+        #     if _is_poller(result):
+        #         print('** heart beat **')
+
+        #         # return LongRunningOperation('Starting {}'.format(name))(result)
+        # except Exception:  # pylint=disable-too-broad-exception
+        #     print('help')
+        #     pass
+
+
     def cli_execute(self, cmd):
         """ sends the command to the CLI to be executed """
         try:
@@ -532,7 +561,22 @@ class Shell(object):
 
             config = Configuration()
             self.app.initialize(config)
-            result = self.app.execute(args)
+
+            if '--no-wait' in args:
+                print(get_status())
+                thread = ExecuteThread(self.app.execute, args)
+                thread.start()
+                self.threads.append(thread)
+                # while thread.is_alive:
+                #     print(get_status())
+                # print(get_status())
+
+                result = None
+
+                #  = self.app.execute(args)
+                # self.handle_long_process(args)
+            else:
+                result = self.app.execute(args)
             self.last_exit = 0
             if result and result.result is not None:
                 from azure.cli.core._output import OutputProducer
@@ -588,9 +632,24 @@ class Shell(object):
                         subprocess.Popen(cmd, shell=True).communicate()
                     else:
                         self.cli_execute(cmd)
+
+                    if any(thread.isAlive() for thread in self.threads):
+                        print('alive')
+                    else:
+                        print('dead')
             except KeyboardInterrupt:  # CTRL C
                 self.set_prompt()
                 continue
 
         print('Have a lovely day!!')
         telemetry.conclude()
+
+
+class ExecuteThread(threading.Thread):
+    def __init__(self, func, args):
+        super(ExecuteThread, self).__init__()
+        self.args = args
+        self.func = func
+
+    def run(self):
+        self.func(self.args)
