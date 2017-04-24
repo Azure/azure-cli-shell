@@ -35,7 +35,7 @@ from azclishell.util import get_window_dim, parse_quotes
 
 import azure.cli.core.azlogging as azlogging
 from azure.cli.core.application import Configuration
-from azure.cli.core.commands import LongRunningOperation, get_op_handler
+from azure.cli.core.commands import LongRunningOperation, get_op_handler, StandardOut
 from azure.cli.core.cloud import get_active_cloud_name
 from azure.cli.core._config import az_config, DEFAULTS_SECTION
 from azure.cli.core._environment import get_config_dir
@@ -108,6 +108,23 @@ def space_toolbar(settings_items, cols, empty_space):
     empty_space = empty_space[len(NOTIFICATIONS) + len(settings) + 1:]
     return settings, empty_space
 
+PROGRESS = ''
+class ProgressView(StandardOut):
+    """ custom output for progress reporting """
+
+    def write(self, message, value, total_value):
+        """ writes the progres """
+        global PROGRESS
+        if value and total_value:
+            bar = self._format_value(value, total_value) + "\n"
+        PROGRESS = message
+        # print('running')
+
+    def flush(self):
+        """ flushes the message"""
+        pass
+        # self.out.flush()
+
 
 # pylint: disable=too-many-instance-attributes
 class Shell(object):
@@ -139,6 +156,7 @@ class Shell(object):
         self.config_default = ""
         self.default_command = ""
         self.threads = []
+        self.curr_thread = None
 
     @property
     def cli(self):
@@ -196,10 +214,10 @@ class Shell(object):
         curr_cloud = "Cloud: {}".format(get_active_cloud_name())
         tool_val = '{}'.format('Subscription: {}'.format(sub_name) if sub_name else curr_cloud)
 
-        if any(thread.isAlive() for thread in self.threads):
-            tool_val2 = 'alive'
-        else:
-            tool_val2 = 'dead'
+        # if self.curr_thread and self.curr_thread.isAlive():
+        #     tool_val2 = 'alive'
+        # else:
+        #     tool_val2 = 'dead'
 
         settings_items = [
             " [F1]Layout",
@@ -207,7 +225,7 @@ class Shell(object):
             "[F3]Keys",
             "[Ctrl+D]Quit",
             tool_val,
-            tool_val2
+            PROGRESS
         ]
         return settings_items
 
@@ -402,7 +420,7 @@ class Shell(object):
         break_flag = False
         continue_flag = False
 
-        if text and text.split()[0].lower() == 'az':
+        if text.split() and text.split()[0].lower() == 'az':
             telemetry.track_ssg('az', text)
             cmd = ' '.join(text.split()[1:])
         if self.default_command:
@@ -569,9 +587,10 @@ class Shell(object):
             self.app.initialize(config)
 
             if '--no-wait' in args:
-                # print(get_status())
+                args.remove('--no-wait')
                 thread = ExecuteThread(self.app.execute, args)
                 thread.start()
+                self.curr_thread = thread
                 self.threads.append(thread)
                 result = None
 

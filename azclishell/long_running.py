@@ -1,33 +1,46 @@
 #!/usr/bin/env python
-""" This is a Troy snippet for progress """
+# from azure.cli.core.commands import StandardOut
 
-import time 
-import sys
-import os
 
-total = 32212255232
+# class ProgressView(StandardOut):
+#     def __init__(self):
+#         pass
 
-try:
-    while True:
-        size = os.path.getsize('large30.vhd')
-        percent = size / total
-        bar_len = 100
-        completed = int(bar_len*percent)
- 
-        message = '\r['
-        for i in range(bar_len):
-            if i < completed:
-                message += '#'
-            else:
-                message += ' '
-        message += ']  {:.4%}'.format(percent)
- 
-        sys.stdout.write(message)
-        sys.stdout.flush()
-        time.sleep(0.2)
-except KeyboardInterrupt:
-    sys.stdout.write("Bye\n")
-    sys.exit(0)
+#     def write(self, message, value, total_value):
+
+
+
+
+
+
+
+# import time 
+# import sys
+# import os
+
+# total = 32212255232
+
+# try:
+#     while True:
+#         size = os.path.getsize('large30.vhd')
+#         percent = size / total
+#         bar_len = 100
+#         completed = int(bar_len*percent)
+
+#         message = '\r['
+#         for i in range(bar_len):
+#             if i < completed:
+#                 message += '#'
+#             else:
+#                 message += ' '
+#         message += ']  {:.4%}'.format(percent)
+
+#         sys.stdout.write(message)
+#         sys.stdout.flush()
+#         time.sleep(0.2)
+# except KeyboardInterrupt:
+#     sys.stdout.write("Bye\n")
+#     sys.exit(0)
 
 
 """
