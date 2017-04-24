@@ -52,6 +52,7 @@ NOTIFICATIONS = ""
 PROFILE = Profile()
 SELECT_SYMBOL = azclishell.configuration.SELECT_SYMBOL
 PART_SCREEN_EXAMPLE = .3
+SPINNING_WHEEL = {1 :'|', 2 : '/', 3 : '-', 0 : '\\'}
 
 
 def handle_cd(cmd):
@@ -125,6 +126,10 @@ class ProgressView(StandardOut):
         pass
         # self.out.flush()
 
+    def end(self, message=''):
+        global PROGRESS
+        PROGRESS = 'Finished'
+
 
 # pylint: disable=too-many-instance-attributes
 class Shell(object):
@@ -157,6 +162,7 @@ class Shell(object):
         self.default_command = ""
         self.threads = []
         self.curr_thread = None
+        self.spin_val = -1
 
     @property
     def cli(self):
@@ -170,13 +176,8 @@ class Shell(object):
         """
         brings up the metadata for the command if there is a valid command already typed
         """
-        _, cols = get_window_dim()
-        cols = int(cols)
         document = cli.current_buffer.document
         text = document.text
-        empty_space = ""
-        for i in range(cols):  # pylint: disable=unused-variable
-            empty_space += " "
 
         text = text.replace('az', '')
         if self.default_command:
@@ -188,21 +189,34 @@ class Shell(object):
         self.example_docs = u'{}'.format(example)
 
         self._update_default_info()
-
-        settings, empty_space = space_toolbar(self._toolbar_info(), cols, empty_space)
-
         cli.buffers['description'].reset(
             initial_document=Document(self.description_docs, cursor_position=0))
         cli.buffers['parameter'].reset(
             initial_document=Document(self.param_docs))
         cli.buffers['examples'].reset(
             initial_document=Document(self.example_docs))
-        cli.buffers['bottom_toolbar'].reset(
-            initial_document=Document(u'{}{}{}'.format(NOTIFICATIONS, settings, empty_space)))
         cli.buffers['default_values'].reset(
             initial_document=Document(
                 u'{}'.format(self.config_default if self.config_default else 'No Default Values')))
+        self._update_toolbar(return_val=False)
+
+    def _update_toolbar(self, return_val=True):
+        cli = self.cli
+        _, cols = get_window_dim()
+        cols = int(cols)
+
+        empty_space = ""
+        for i in range(cols):  # pylint: disable=unused-variable
+            empty_space += " "
+
+        settings, stop = self._toolbar_info()
+        settings, empty_space = space_toolbar(settings, cols, empty_space)
+        cli.buffers['bottom_toolbar'].reset(
+            initial_document=Document(u'{}{}{}'.format(NOTIFICATIONS, settings, empty_space)))
+
         cli.request_redraw()
+        if return_val:
+            return stop
 
     def _toolbar_info(self):
         sub_name = ""
@@ -214,10 +228,15 @@ class Shell(object):
         curr_cloud = "Cloud: {}".format(get_active_cloud_name())
         tool_val = '{}'.format('Subscription: {}'.format(sub_name) if sub_name else curr_cloud)
 
-        # if self.curr_thread and self.curr_thread.isAlive():
-        #     tool_val2 = 'alive'
-        # else:
-        #     tool_val2 = 'dead'
+        tool_val2 = PROGRESS
+        if PROGRESS and PROGRESS != 'Finished':
+            if self.spin_val >= 0:
+                self.spin_val = (self.spin_val + 1) % 4
+                tool_val2 = SPINNING_WHEEL[self.spin_val]
+            else:
+                self.spin_val = 0
+                tool_val2 = SPINNING_WHEEL[self.spin_val]
+
 
         settings_items = [
             " [F1]Layout",
@@ -225,10 +244,9 @@ class Shell(object):
             "[F3]Keys",
             "[Ctrl+D]Quit",
             tool_val,
-            PROGRESS
+            tool_val2
         ]
-        return settings_items
-
+        return settings_items, PROGRESS == 'Finished'
 
     def generate_help_text(self, text):
         """ generates the help text based on commands typed """
@@ -565,16 +583,16 @@ class Shell(object):
             config = Configuration()
             self.app.initialize(config)
 
-            # if '--no-wait' in args:
-            #     args.remove('--no-wait')
-            #     thread = ExecuteThread(self.app.execute, args)
-            #     thread.start()
-            #     self.curr_thread = thread
-            #     self.threads.append(thread)
-            #     result = None
+            if '--no-wait' in args:
+                args.remove('--no-wait')
+                thread = ExecuteThread(self.app.execute, args)
+                thread.start()
+                self.curr_thread = thread
+                self.threads.append(thread)
+                result = None
 
-            # else:
-            result = self.app.execute(args)
+            else:
+                result = self.app.execute(args)
             self.last_exit = 0
             if result and result.result is not None:
                 from azure.cli.core._output import OutputProducer
@@ -599,6 +617,8 @@ class Shell(object):
         self.cli.buffers['symbols'].reset(
             initial_document=Document(u'{}'.format(SHELL_HELP)))
 
+        thread = ToolbarThread(self._update_toolbar)
+        thread.start()
         while True:
             try:
                 try:
@@ -647,3 +667,19 @@ class ExecuteThread(threading.Thread):
 
     def run(self):
         self.func(self.args)
+
+
+class ToolbarThread(threading.Thread):
+    def __init__(self, func):
+        super(ToolbarThread, self).__init__()
+        self.func = func
+
+    def run(self):
+        import time
+        try:
+            while True:
+                if self.func():
+                    break
+                time.sleep(.5)
+        except KeyboardInterrupt:
+            pass
