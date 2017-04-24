@@ -4,9 +4,9 @@
 import time 
 import sys
 import os
- 
+
 total = 32212255232
- 
+
 try:
     while True:
         size = os.path.getsize('large30.vhd')

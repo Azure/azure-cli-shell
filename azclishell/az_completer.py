@@ -291,7 +291,7 @@ class AzCompleter(Completer):
                 if self.validate_completion(kid.data, txtspt[-1], text, False):
                     yield Completion(
                         str(kid.data), -len(txtspt[-1]))
-        elif self._is_command:
+        elif self._is_command and self.curr_command.strip() in self.command_parameters:
             for param in self.command_parameters[self.curr_command.strip()]:
                 if param.startswith('--'):
                     yield self.yield_param_completion(param, '')

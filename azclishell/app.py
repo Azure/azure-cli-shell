@@ -35,7 +35,7 @@ from azclishell.util import get_window_dim, parse_quotes
 
 import azure.cli.core.azlogging as azlogging
 from azure.cli.core.application import Configuration
-from azure.cli.core.commands import LongRunningOperation, get_op_handler, get_status
+from azure.cli.core.commands import LongRunningOperation, get_op_handler
 from azure.cli.core.cloud import get_active_cloud_name
 from azure.cli.core._config import az_config, DEFAULTS_SECTION
 from azure.cli.core._environment import get_config_dir
@@ -94,26 +94,6 @@ def space_examples(list_examples, rows):
         page_number = '\n' + str(get_section()) + "/" + str(math.ceil(num_newline / len_of_excerpt))
 
     return example + page_number
-
-
-def _toolbar_info():
-    sub_name = ""
-    try:
-        sub_name = PROFILE.get_subscription()[_SUBSCRIPTION_NAME]
-    except CLIError:
-        pass
-
-    curr_cloud = "Cloud: {}".format(get_active_cloud_name())
-    tool_val = '{}'.format('Subscription: {}'.format(sub_name) if sub_name else curr_cloud)
-
-    settings_items = [
-        " [F1]Layout",
-        "[F2]Defaults",
-        "[F3]Keys",
-        "[Ctrl+D]Quit",
-        tool_val
-    ]
-    return settings_items
 
 
 def space_toolbar(settings_items, cols, empty_space):
@@ -191,7 +171,7 @@ class Shell(object):
 
         self._update_default_info()
 
-        settings, empty_space = space_toolbar(_toolbar_info(), cols, empty_space)
+        settings, empty_space = space_toolbar(self._toolbar_info(), cols, empty_space)
 
         cli.buffers['description'].reset(
             initial_document=Document(self.description_docs, cursor_position=0))
@@ -205,6 +185,32 @@ class Shell(object):
             initial_document=Document(
                 u'{}'.format(self.config_default if self.config_default else 'No Default Values')))
         cli.request_redraw()
+
+    def _toolbar_info(self):
+        sub_name = ""
+        try:
+            sub_name = PROFILE.get_subscription()[_SUBSCRIPTION_NAME]
+        except CLIError:
+            pass
+
+        curr_cloud = "Cloud: {}".format(get_active_cloud_name())
+        tool_val = '{}'.format('Subscription: {}'.format(sub_name) if sub_name else curr_cloud)
+
+        if any(thread.isAlive() for thread in self.threads):
+            tool_val2 = 'alive'
+        else:
+            tool_val2 = 'dead'
+
+        settings_items = [
+            " [F1]Layout",
+            "[F2]Defaults",
+            "[F3]Keys",
+            "[Ctrl+D]Quit",
+            tool_val,
+            tool_val2
+        ]
+        return settings_items
+
 
     def generate_help_text(self, text):
         """ generates the help text based on commands typed """
@@ -563,18 +569,12 @@ class Shell(object):
             self.app.initialize(config)
 
             if '--no-wait' in args:
-                print(get_status())
+                # print(get_status())
                 thread = ExecuteThread(self.app.execute, args)
                 thread.start()
                 self.threads.append(thread)
-                # while thread.is_alive:
-                #     print(get_status())
-                # print(get_status())
-
                 result = None
 
-                #  = self.app.execute(args)
-                # self.handle_long_process(args)
             else:
                 result = self.app.execute(args)
             self.last_exit = 0
@@ -594,7 +594,7 @@ class Shell(object):
             self.last_exit = int(ex.code)
 
     def run(self):
-
+        """ starts the REPL """
         telemetry.start()
 
         from azclishell.configuration import SHELL_HELP
@@ -633,10 +633,6 @@ class Shell(object):
                     else:
                         self.cli_execute(cmd)
 
-                    if any(thread.isAlive() for thread in self.threads):
-                        print('alive')
-                    else:
-                        print('dead')
             except KeyboardInterrupt:  # CTRL C
                 self.set_prompt()
                 continue
