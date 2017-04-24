@@ -112,7 +112,7 @@ PROGRESS = ''
 class ProgressView(StandardOut):
     """ custom output for progress reporting """
 
-    def write(self, message, value, total_value):
+    def write(self, message, value=None, total_value=None):
         """ writes the progres """
         global PROGRESS
         if value and total_value:
@@ -420,7 +420,8 @@ class Shell(object):
         break_flag = False
         continue_flag = False
 
-        if text.split() and text.split()[0].lower() == 'az':
+        if text and len(text.split()) > 0\
+           and text.split()[0].lower() == 'az':
             telemetry.track_ssg('az', text)
             cmd = ' '.join(text.split()[1:])
         if self.default_command:
@@ -548,28 +549,6 @@ class Shell(object):
         print('pass')
         """ in LongRUnningOperation there is the call method which could be usefull """
 
-        # client = None
-        # try:
-        #     op = get_op_handler('azure.cli.command_modules.vm.custom#create_vm')
-        #     try:
-        #         result = op(client, **kwargs) if client else op(**kwargs)
-        #     except Exception as ex:  # pylint: disable=broad-except
-        #             raise ex
-
-        #     # # apply results transform if specified
-        #     # if transform_result:
-        #     #     return transform_result(result)
-
-        #     # otherwise handle based on return type of results
-        #     if _is_poller(result):
-        #         print('** heart beat **')
-
-        #         # return LongRunningOperation('Starting {}'.format(name))(result)
-        # except Exception:  # pylint=disable-too-broad-exception
-        #     print('help')
-        #     pass
-
-
     def cli_execute(self, cmd):
         """ sends the command to the CLI to be executed """
         try:
@@ -586,16 +565,16 @@ class Shell(object):
             config = Configuration()
             self.app.initialize(config)
 
-            if '--no-wait' in args:
-                args.remove('--no-wait')
-                thread = ExecuteThread(self.app.execute, args)
-                thread.start()
-                self.curr_thread = thread
-                self.threads.append(thread)
-                result = None
+            # if '--no-wait' in args:
+            #     args.remove('--no-wait')
+            #     thread = ExecuteThread(self.app.execute, args)
+            #     thread.start()
+            #     self.curr_thread = thread
+            #     self.threads.append(thread)
+            #     result = None
 
-            else:
-                result = self.app.execute(args)
+            # else:
+            result = self.app.execute(args)
             self.last_exit = 0
             if result and result.result is not None:
                 from azure.cli.core._output import OutputProducer
