@@ -25,7 +25,6 @@ def update_frequency():
         except ValueError:
             frequency = {}
 
-
     with open(os.path.join(get_config_dir(), SHELL_CONFIG.get_frequency()), 'w') as freq:
         now = datetime.datetime.now()
         now = today_format(now)
