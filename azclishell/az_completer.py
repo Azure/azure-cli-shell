@@ -194,7 +194,7 @@ class AzCompleter(Completer):
                 if self.cmdtab[self.curr_command].arguments[arg_name].completer:
                     try:
                         for comp in self.cmdtab[self.curr_command].arguments[arg_name].completer(
-                                parsed_args=parse_args):
+                                prefix=prefix, action=None, parsed_args=parse_args):
 
                             for comp in gen_dyn_completion(
                                     comp, started_param, prefix, text):
@@ -203,7 +203,7 @@ class AzCompleter(Completer):
                     except TypeError:
                         try:
                             for comp in self.cmdtab[self.curr_command].\
-                                    arguments[arg_name].completer(prefix):
+                                    arguments[arg_name].completer(prefix=prefix):
 
                                 for comp in gen_dyn_completion(
                                         comp, started_param, prefix, text):
