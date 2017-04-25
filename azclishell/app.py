@@ -36,6 +36,7 @@ from azclishell.util import get_window_dim, parse_quotes
 import azure.cli.core.azlogging as azlogging
 from azure.cli.core.application import Configuration
 from azure.cli.core.commands import LongRunningOperation, get_op_handler, StandardOut
+from azure.cli.core.progress import StandardOut
 from azure.cli.core.cloud import get_active_cloud_name
 from azure.cli.core._config import az_config, DEFAULTS_SECTION
 from azure.cli.core._environment import get_config_dir
@@ -586,8 +587,14 @@ class Shell(object):
             if '--no-wait' in args:
                 args.remove('--no-wait')
                 thread = ExecuteThread(self.app.execute, args)
+                thread.daemon = True
                 thread.start()
+                self.threads.append(thread)
                 self.curr_thread = thread
+
+                thread = ToolbarThread(self._update_toolbar)
+                thread.daemon = True
+                thread.start()
                 self.threads.append(thread)
                 result = None
 
@@ -617,8 +624,6 @@ class Shell(object):
         self.cli.buffers['symbols'].reset(
             initial_document=Document(u'{}'.format(SHELL_HELP)))
 
-        thread = ToolbarThread(self._update_toolbar)
-        thread.start()
         while True:
             try:
                 try:
@@ -660,6 +665,7 @@ class Shell(object):
 
 
 class ExecuteThread(threading.Thread):
+    """ thread for executing commands """
     def __init__(self, func, args):
         super(ExecuteThread, self).__init__()
         self.args = args
@@ -670,6 +676,7 @@ class ExecuteThread(threading.Thread):
 
 
 class ToolbarThread(threading.Thread):
+    """ thread to keep the toolbar spinner spinning """
     def __init__(self, func):
         super(ToolbarThread, self).__init__()
         self.func = func
