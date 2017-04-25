@@ -35,7 +35,7 @@ from azclishell.util import get_window_dim, parse_quotes
 
 import azure.cli.core.azlogging as azlogging
 from azure.cli.core.application import Configuration
-from azure.cli.core.commands import LongRunningOperation, get_op_handler, StandardOut
+from azure.cli.core.commands import LongRunningOperation, get_op_handler
 from azure.cli.core.progress import StandardOut
 from azure.cli.core.cloud import get_active_cloud_name
 from azure.cli.core._config import az_config, DEFAULTS_SECTION
