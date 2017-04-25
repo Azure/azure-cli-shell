@@ -10,7 +10,8 @@ import json
 from azclishell.configuration import CONFIGURATION, get_config_dir
 
 SHELL_CONFIG = CONFIGURATION
-
+DAYS_AGO = 28
+ACTIVE_STATUS = 5
 
 def today_format(now):
     """ returns the date format """
@@ -41,15 +42,15 @@ def frequency_measurement():
     freq = update_frequency()
     count = 0
     base = datetime.datetime.now()
-    date_list = [base - datetime.timedelta(days=x) for x in range(1, 7)]
+    date_list = [base - datetime.timedelta(days=x) for x in range(1, DAYS_AGO)]
     for day in date_list:
-        count += freq.get(today_format(day), 0)
+        count += 1 if freq.get(today_format(day), 0) > 0 else 0
     return count
 
 
 def frequency_heuristic():
     """ decides whether user meets requirements for frequency """
-    return frequency_measurement() > 4
+    return frequency_measurement() >= ACTIVE_STATUS
 
 
 frequent_user = frequency_heuristic()
