@@ -111,6 +111,7 @@ def space_toolbar(settings_items, cols, empty_space):
     return settings, empty_space
 
 PROGRESS = ''
+DONE_STR = 'Finished'
 class ProgressView(StandardOut):
     """ custom output for progress reporting """
 
@@ -129,7 +130,7 @@ class ProgressView(StandardOut):
 
     def end(self, message=''):
         global PROGRESS
-        PROGRESS = 'Finished'
+        PROGRESS = DONE_STR
 
 
 # pylint: disable=too-many-instance-attributes
@@ -230,13 +231,15 @@ class Shell(object):
         tool_val = '{}'.format('Subscription: {}'.format(sub_name) if sub_name else curr_cloud)
 
         tool_val2 = PROGRESS
-        if PROGRESS and PROGRESS != 'Finished':
+        if PROGRESS and PROGRESS != DONE_STR:
             if self.spin_val >= 0:
                 self.spin_val = (self.spin_val + 1) % 4
                 tool_val2 = SPINNING_WHEEL[self.spin_val]
             else:
                 self.spin_val = 0
                 tool_val2 = SPINNING_WHEEL[self.spin_val]
+        elif PROGRESS == DONE_STR:
+            tool_val2 = ''
 
 
         settings_items = [
@@ -247,7 +250,7 @@ class Shell(object):
             tool_val,
             tool_val2
         ]
-        return settings_items, PROGRESS == 'Finished'
+        return settings_items, PROGRESS == DONE_STR
 
     def generate_help_text(self, text):
         """ generates the help text based on commands typed """
@@ -686,7 +689,8 @@ class ToolbarThread(threading.Thread):
         try:
             while True:
                 if self.func():
+                    time.sleep(4)
                     break
-                time.sleep(.5)
+                time.sleep(.25)
         except KeyboardInterrupt:
             pass
