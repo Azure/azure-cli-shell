@@ -36,7 +36,7 @@ from azclishell.util import get_window_dim, parse_quotes
 import azure.cli.core.azlogging as azlogging
 from azure.cli.core.application import Configuration
 from azure.cli.core.commands import LongRunningOperation, get_op_handler
-from azure.cli.core.commands.progress import StandardOut
+from azure.cli.core.commands.progress import ProgressView, StandardOut
 from azure.cli.core.cloud import get_active_cloud_name
 from azure.cli.core._config import az_config, DEFAULTS_SECTION
 from azure.cli.core._environment import get_config_dir
@@ -112,21 +112,19 @@ def space_toolbar(settings_items, cols, empty_space):
 
 PROGRESS = ''
 DONE_STR = 'Finished'
-class ProgressView(StandardOut):
+class ShellProgressView(StandardOut):
     """ custom output for progress reporting """
 
-    def write(self, message, value=None, total_value=None):
+    def write(self, message, percent):
         """ writes the progres """
         global PROGRESS
-        if value and total_value:
-            bar = self._format_value(value, total_value) + "\n"
+        if percent:
+            progress = self._format_value(percent) + "\n"
         PROGRESS = message
-        # print('running')
 
     def flush(self):
         """ flushes the message"""
         pass
-        # self.out.flush()
 
     def end(self, message=''):
         global PROGRESS
